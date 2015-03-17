@@ -47,8 +47,7 @@ unsigned char ecu_reader::request(void)
    
    if (can2.read(77777777777777777777777)) {
                
-        if((can_MsgRx.id == PID_REPLY) && (can_MsgRx.data[2] == pid))
-        { 
+        if((can_MsgRx.id == PID_REPLY) && (can_MsgRx.data[2] == pid)) { 
                         switch(can_MsgRx.data[2])
                         {   /* Details from http://en.wikipedia.org/wiki/OBD-II_PIDs */
                             case ENGINE_RPM:              //   ((A*256)+B)/4    [RPM]
@@ -100,8 +99,7 @@ unsigned char ecu_reader::request(void)
 
 }
 
-unsigned char ecu_reader::dump(FILE * dumpFile)
-{    
+unsigned char ecu_reader::dump(FILE * dumpFile) {    
 	CANTimer.reset();
 	CANTimer.start();
    
