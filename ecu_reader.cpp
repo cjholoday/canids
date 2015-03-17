@@ -9,8 +9,7 @@ Timer CANTimer;
 namespace mbed { 
 
 
-ecu_reader::ecu_reader(int can_speed)
-{
+ecu_reader::ecu_reader(int can_speed) {
     can2.frequency(can_speed);
 }
 
@@ -104,8 +103,7 @@ unsigned char ecu_reader::dump(FILE * dumpFile) {
 	CANTimer.reset();
 	CANTimer.start();
    
-	while(CANTimer.read_ms() < TIMEOUT) 
-	{
+	while(CANTimer.read_ms() < TIMEOUT) {
 
 		if (can2.read(can_MsgRx)) 
 		{
