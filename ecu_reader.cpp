@@ -106,8 +106,7 @@ unsigned char ecu_reader::dump(FILE * dumpFile)
 	CANTimer.reset();
 	CANTimer.start();
    
-	while(CANTimer.read_ms() < TIMEOUT) 
-	{
+	while(CANTimer.read_ms() < TIMEOUT) {
 
 		if (can2.read(can_MsgRx)) 
 		{
