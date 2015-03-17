@@ -100,8 +100,7 @@ unsigned char ecu_reader::request(void)
 
 }
 
-unsigned char ecu_reader::dump(FILE * dumpFile)
-{    
+unsigned char ecu_reader::dump(FILE * dumpFile) {    
 	CANTimer.reset();
 	CANTimer.start();
    
