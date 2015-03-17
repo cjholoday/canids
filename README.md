@@ -17,3 +17,12 @@ This README would normally document whatever steps are necessary to get your app
 * This is a private project
 * So if you are not from the group and you are in, 
 * please email dangying@umich.edu to tell me the project is accidentally set public
+
+### To run the test files ###
+
+* Joystick down to run the current attacks
+* Once "test attacks to run" is shown, you can begin sending attack messages
+* Down: force headlights off
+* Up: force headlights on
+* Right: Fan to max
+* Left: Fan to min
