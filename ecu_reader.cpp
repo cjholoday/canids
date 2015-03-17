@@ -9,8 +9,7 @@ Timer CANTimer;
 namespace mbed { 
 
 
-ecu_reader::ecu_reader(int can_speed)
-{
+ecu_reader::ecu_reader(int can_speed) {
     can2.frequency(can_speed);
 }
 
