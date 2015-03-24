@@ -27,7 +27,7 @@ accept liability for any damage arising from its use.
 #include "SDFileSystem.h"
 #include <errno.h>
 #define CANDUMP_PATH "/sd/CANdump.txt"
-#define ARRAY_SIZE 0x7FF
+#define ARRAY_SIZE 0x7FF // 2048 bits for all common hexcode
 #define COLLECTION_TIME_MS 5000
 
 GPS gps(p28, p27);
@@ -171,69 +171,6 @@ void sd_demo(void){
  
 }
 
-#if 0
-
-void send_demo(){
-	char line[80];
-	CANMessage myMessage;
-	FILE * storedMsgs = fopen(CANDUMP_PATH, "r");
-	if(storedMsgs == NULL{
-		lcd.cls();
-		lcd.locate(0,0);
-		lcd.printf("Error opening");
-		lcd.locate(0,1);
-		lcd.printf("CAN file, exiting");
-		
-	}
-	while(1){
-		if(!fgets(&line[0],80,storedMsgs)){
-			lcd.locate(0,0);
-			lcd.printf("End of file");
-			return;
-		}
-		unsigned int id;
-		char can_msg[8];
-		memset(can_msg,0, 8);
-		lcd.locate(0,0);
-		lcd.printf("%s", line);
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wformat" //we need this to be unsigned, but char is signed. so we disable the warning only for this line
-		sscanf(line, "%*f\t\t%x\t %2hx %2hx %2hx %2hx %2hx %2hx %2hx %2hx\n",&id,&can_msg[0],
-			&can_msg[1],&can_msg[2],&can_msg[3],
-			&can_msg[4],&can_msg[5],&can_msg[6],
-			&can_msg[7]);
-#pragma GCC diagnostic pop //restore previous warning state
-		lcd.locate(0,0);
-		lcd.printf("%02x\t %02x %02x %02x", id, can_msg[0], can_msg[1], can_msg[2]);
-		lcd.locate(0,1);
-		lcd.printf("%02x %02x %02x %02x %02x", can_msg[3], can_msg[4], can_msg[5], can_msg[6], can_msg[7]); 
-				
-		while(1){
-			//can't move back up the list yet. 
-			/*if(up == 0)
-			{
-				break;
-			}*/
-			if(down == 0){
-				wait(0.2);
-				break;
-			}
-			if(left == 0){
-				return;
-			}
-			if(click == 0){
-				//send the message
-				for(int i = 0; i < 10; i++){
-					obdii.send(id, can_msg);
-				}
-			}
-		}
-	}
-	//now do things. 
-}
-
-#endif
-
 void attempt_engine(){
 	int counterID[ARRAY_SIZE]; //
 	memset(counterID,ARRAY_SIZE*sizeof(int),0);
@@ -244,23 +181,24 @@ void attempt_engine(){
 }
 
 void message_reader(){
-	int counterID[ARRAY_SIZE];
+	
+	int counterID[ARRAY_SIZE]; // preallocates memory  for the hexcode ID
 	for(int i = 0; i < ARRAY_SIZE; i++){
-		counterID[i] = 0;
+		counterID[i] = 0; // creates the hexcode ID
 	}
 	timer.start();//Start the timer.
 	CANMessage myMessage;
 	while (timer.read_ms() < COLLECTION_TIME_MS){
 		if (can2.read(myMessage)) {
 			if(myMessage.id != 0){
-				counterID[myMessage.id]++;
+				counterID[myMessage.id]++; // counts number IDs that have passed
 			}
-			led1 = !led1;
+			led1 = !led1; // led flash while in use
 		}
 	}
 	
 	timer.stop();
-	FILE *fp = fopen("/sd/messagestore.txt", "w");
+	FILE *fp = fopen("/sd/messagestore.txt", "w"); // create a writable file "messagestore"
 	lcd.locate(0,1);
 	if (fp == NULL){
 		lcd.printf("file open failed %d", errno);
@@ -268,15 +206,15 @@ void message_reader(){
 	}
 	
 	double totTime;
-	totTime = timer.read_ms();
+	totTime = timer.read_ms(); // read time lapse in milliseconds
 	lcd.printf("%f\t\n", totTime);
 	for (unsigned int id = 0; id < ARRAY_SIZE; id++){
-		fprintf(fp,"0x%x \t\t 0x%x \t\t %f\n", id,counterID[id],counterID[id]/totTime*1000);
-		//fprintf(fp,"%x\t\t %f", id, counterID[id]/totTime);
+		//fprintf(fp,"0x%x \t\t 0x%x \t\t %f\n", id,counterID[id],counterID[id]/totTime*1000);
+		fprintf(fp,"%x\t\t %f", id, counterID[id]/totTime); // prints ID and ID frequancy
 	}
 	fclose(fp);
 	lcd.cls();
 	lcd.locate(0,0);
 	lcd.printf("file completed");
-	//now do things. 
+	//template file written, complete more tasks
 }
