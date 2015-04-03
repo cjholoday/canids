@@ -25,7 +25,7 @@ accept liability for any damage arising from its use.
 #include "TextLCD.h"
 #include "GPS.h"
 #include "SDFileSystem.h"
-#include <errno.h>
+#include <errno.h> //system error numbers
 #define CANDUMP_PATH "/sd/CANdump.txt"
 #define ARRAY_SIZE 0x7FF // 2048 bits for all common hexcode
 #define COLLECTION_TIME_MS 5000
@@ -61,7 +61,7 @@ int main() {
     left.mode(PullUp);
     up.mode(PullUp);
     
-    printf("ECU Reader \n"); 
+    printf("ECU Reader\n"); 
     lcd.locate(0,0);                // Set LCD cursor position
     lcd.printf("CAN-Bus demo");
     
@@ -79,16 +79,17 @@ int main() {
     
     pc.printf("\nU-CAN:D-REQ:L-SD");
 
-    while(1){    // Wait until option is selected by the joystick
+    while(1) {    // Wait until option is selected by the joystick
         if(down == 0) attempt_engine();
         if(left == 0) sd_demo();
         if(right == 0) message_reader();
         if(up == 0) break;
-        
     }
-	FILE *fp = fopen(CANDUMP_PATH, "a");
-    lcd.cls();
-	lcd.locate(0,0);
+
+    //if up is pressed
+    FILE *fp = fopen(CANDUMP_PATH, "a"); //a for appending
+    lcd.cls();//clear lcd
+    lcd.locate(0,0);
     lcd.printf("Dumping CAN...");
     lcd.locate(0,1);
     lcd.printf("press joystick");
@@ -101,19 +102,23 @@ int main() {
         obdii.dump(fp);
         if(click == 0) break;
         lcd.locate(0,0);
-        lcd.printf("timer: %f", timer.read());
+        lcd.printf(": %f", timer.read());
     }
-    if(fp  == NULL){
-		lcd.cls();
-		lcd.locate(0,0);
-		lcd.printf("File pointer issue");
-	}
-	fclose(fp);
-	lcd.cls();
+
+    //if file can't open
+    if(fp == NULL){
+        lcd.cls();
 	lcd.locate(0,0);
-	lcd.printf("safe to remove");
-	lcd.locate(0,1);
-	lcd.printf("SD card. ");
+	lcd.printf("File pointer issue");
+    }
+
+    //done with the file and action
+    fclose(fp);
+    lcd.cls();
+    lcd.locate(0,0);
+    lcd.printf("safe to remove");
+    lcd.locate(0,1);
+    lcd.printf("SD card. ");
 }
 
 void gps_demo(void){
@@ -126,17 +131,17 @@ void gps_demo(void){
     lcd.cls();
    
     while(1){
-      if(gps.sample()) {
-        lcd.cls();
-        lcd.printf("Long:%f", gps.longitude);
-           lcd.locate(0,1);
-        lcd.printf("Lat:%f", gps.latitude);
+	if(gps.sample()) {
+            lcd.cls();
+            lcd.printf("Long:%f", gps.longitude);
+            lcd.locate(0,1);
+            lcd.printf("Lat:%f", gps.latitude);
             pc.printf("I'm at %f, %f\n", gps.longitude, gps.latitude);
-        } else {
+        } 
+        else {
             pc.printf("Oh Dear! No lock :(\n");
             lcd.cls();
             lcd.printf("Waiting for lock");
-   
         }
     }
  
@@ -144,7 +149,7 @@ void gps_demo(void){
 
 void sd_demo(void){
     lcd.cls();
-     printf("\nSD demo");
+    printf("\nSD demo");
     lcd.printf("SD demo");
     wait(2);      
     lcd.cls();
@@ -153,7 +158,7 @@ void sd_demo(void){
     if(fp == NULL) {
         lcd.cls();
         lcd.printf("Could not open file for write\n");
-         pc.printf("\nCould not open file for write");
+        pc.printf("\nCould not open file for write");
     }
     fprintf(fp, "Hello fun SD Card World! testing 1234");
     fclose(fp); 
@@ -166,55 +171,56 @@ void sd_demo(void){
         wait(0.1);
         led2 = 0;
         wait(0.1);
-   
     }
  
 }
 
 void attempt_engine(){
-	int counterID[ARRAY_SIZE]; //
-	memset(counterID,ARRAY_SIZE*sizeof(int),0);
-	while(1){
-		obdii.request();
-		wait(0.1);
-	}
+    int counterID[ARRAY_SIZE];
+    memset(counterID, ARRAY_SIZE * sizeof(int), 0);
+    while(1){
+        obdii.request();
+        wait(0.1);
+    }
 }
 
 void message_reader(){
+    int counterID[ARRAY_SIZE]; // preallocates memory  for the hexcode ID
+    for(int i = 0; i < ARRAY_SIZE; i++){
+        counterID[i] = 0; // creates the hexcode ID
+    }
+    timer.start(); //Start the timer
+    CANMessage myMessage;
+    while (timer.read_ms() < COLLECTION_TIME_MS){
+        if (can2.read(myMessage)) {
+            if (myMessage.id != 0){
+		counterID[myMessage.id]++; // counts number IDs that have passed
+	    }
+	    led1 = !led1; // led flash while in use
+        }
+    }
 	
-	int counterID[ARRAY_SIZE]; // preallocates memory  for the hexcode ID
-	for(int i = 0; i < ARRAY_SIZE; i++){
-		counterID[i] = 0; // creates the hexcode ID
-	}
-	timer.start();//Start the timer.
-	CANMessage myMessage;
-	while (timer.read_ms() < COLLECTION_TIME_MS){
-		if (can2.read(myMessage)) {
-			if(myMessage.id != 0){
-				counterID[myMessage.id]++; // counts number IDs that have passed
-			}
-			led1 = !led1; // led flash while in use
-		}
-	}
+    timer.stop();
+
+    FILE *fp = fopen("/sd/messagestore.txt", "w"); // create a writable file "messagestore"
+    lcd.locate(0,1);
+    if (fp == NULL){
+        lcd.printf("file open failed %d", errno);
+	return;
+    }
 	
-	timer.stop();
-	FILE *fp = fopen("/sd/messagestore.txt", "w"); // create a writable file "messagestore"
-	lcd.locate(0,1);
-	if (fp == NULL){
-		lcd.printf("file open failed %d", errno);
-		return;
-	}
-	
-	double totTime;
-	totTime = timer.read_ms(); // read time lapse in milliseconds
-	lcd.printf("%f\t\n", totTime);
-	for (unsigned int id = 0; id < ARRAY_SIZE; id++){
-		//fprintf(fp,"0x%x \t\t 0x%x \t\t %f\n", id,counterID[id],counterID[id]/totTime*1000);
-		fprintf(fp,"%x\t\t %f", id, counterID[id]/totTime); // prints ID and ID frequancy
-	}
-	fclose(fp);
-	lcd.cls();
-	lcd.locate(0,0);
-	lcd.printf("file completed");
-	//template file written, complete more tasks
+    double totTime;
+    totTime = timer.read_ms(); // read time lapse in milliseconds
+    lcd.printf("%f\t\n", totTime);
+    for (unsigned int id = 0; id < ARRAY_SIZE; id++){
+        //fprintf(fp,"0x%x \t\t 0x%x \t\t %f\n", id,counterID[id],counterID[id]/totTime*1000);
+        fprintf(fp,"%x\t\t %f", id, counterID[id]/totTime); // prints ID and ID frequancy
+    }
+
+    fclose(fp);
+    lcd.cls();
+    lcd.locate(0,0);
+    lcd.printf("file completed");
+    
+    //template file written, complete more tasks
 }
