@@ -26,7 +26,7 @@ accept liability for any damage arising from its use.
 #include "TextLCD.h"
 #include "GPS.h"
 #include "SDFileSystem.h"
-#include <unordered_map>
+#include <unordered_map> //Hash Map data structure
 #include <errno.h> //system error numbers
 #define CANDUMP_PATH "/sd/CANdump.txt"
 #define ARRAY_SIZE 0x7FF // 2048 bits for all common hexcode
@@ -57,7 +57,7 @@ Timer timer;
 void message_reader(void);
 
 
-struct frequency {
+struct frequency_struct {
     double correct_frequency;
     double current_frequency;
 };
