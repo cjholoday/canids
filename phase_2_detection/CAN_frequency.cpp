@@ -19,16 +19,21 @@ accept liability for any damage arising from its use.
 
 */
 
+#include <unordered_map>
 #include "mbed.h"
 #include "ecu_reader.h"
 #include "globals.h"
 #include "TextLCD.h"
 #include "GPS.h"
 #include "SDFileSystem.h"
+#include <unordered_map> //Hash Map data structure
 #include <errno.h> //system error numbers
 #define CANDUMP_PATH "/sd/CANdump.txt"
 #define ARRAY_SIZE 0x7FF // 2048 bits for all common hexcode
 #define COLLECTION_TIME_MS 5000
+
+//for unordered_map
+using namespace std;
 
 
 GPS gps(p28, p27);
@@ -51,7 +56,19 @@ void attempt_engine(void);
 Timer timer;
 void message_reader(void);
 
+
+struct frequency_struct {
+    double correct_frequency;
+    double current_frequency;
+};
+
+
 int main() {
+
+    //I am not sure we should declare it here or other places
+    unordered_map<unsigned int, *frequency_struct> hashTable;
+
+
     pc.baud(115200);
     //char buffer[20];
     
@@ -144,7 +161,8 @@ void gps_demo(void){
             lcd.cls();
             lcd.printf("Waiting for lock");
         }
-    } 
+    }
+ 
 }
 
 void sd_demo(void){
@@ -172,7 +190,8 @@ void sd_demo(void){
         led2 = 0;
         wait(0.1);
     }
- }
+ 
+}
 
 void attempt_engine(){
     int counterID[ARRAY_SIZE];
@@ -200,24 +219,26 @@ void message_reader(){
     }
     
     timer.stop();
-    
-    FILE *fp = fopen("/sd/messagestore.txt", "w"); // create a file "messagestore" where IDs and frequencies are stored
+
+    FILE *fp = fopen("/sd/messagestore.txt", "w"); // create a writable file "messagestore"
     lcd.locate(0,1);
     if (fp == NULL){
         lcd.printf("file open failed %d", errno);
-        return;
+    return;
     }
     
     double totTime;
     totTime = timer.read_ms(); // read time lapse in milliseconds
     lcd.printf("%f\t\n", totTime);
     for (unsigned int id = 0; id < ARRAY_SIZE; id++){
-        fprintf(fp,"%x %f\n", id, counterID[id]/totTime); // prints ID and ID frequancy
         //fprintf(fp,"0x%x \t\t 0x%x \t\t %f\n", id,counterID[id],counterID[id]/totTime*1000);
+        fprintf(fp,"%x %f\n", id, counterID[id]/totTime); // prints ID and ID frequancy
     }
 
     fclose(fp);
     lcd.cls();
     lcd.locate(0,0);
-    lcd.printf("file completed"); // template file written, complete more tasks
+    lcd.printf("file completed");
+    
+    //template file written, complete more tasks
 }
