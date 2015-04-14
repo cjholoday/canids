@@ -32,7 +32,7 @@ accept liability for any damage arising from its use.
 #define ARRAY_SIZE 0x7FF // 2048 bits for all common hexcode
 #define COLLECTION_TIME_MS 5000
 
-//for unodered_map
+//for unordered_map
 using namespace std;
 
 
