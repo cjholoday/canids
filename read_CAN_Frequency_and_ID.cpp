@@ -28,7 +28,7 @@ accept liability for any damage arising from its use.
 #include <errno.h> //system error numbers
 #define CANDUMP_PATH "/sd/CANdump.txt"
 #define ARRAY_SIZE 0x7FF // 2048 bits for all common hexcode
-#define COLLECTION_TIME_MS 5000
+#define ONE_SECOND_MULTIPLIER 1000
 
 
 GPS gps(p28, p27);
@@ -185,12 +185,20 @@ void attempt_engine(){
 
 void message_reader(){
     int counterID[ARRAY_SIZE]; // preallocates memory  for the hexcode ID
+    double collection_time_ms, variable_seconds;
+    
     for(int i = 0; i < ARRAY_SIZE; i++){
         counterID[i] = 0; // creates the hexcode ID
     }
     timer.start(); //Start the timer
+    FILE *vt = fopen("variable_time.txt", "r")
+    fscanf(vt, "%d", &variable_seconds);
+    fclose(vt);
+    collection_time_ms = variable_seconds *ONE_SECOND_MULTIPLIER;
+        
+    
     CANMessage myMessage;
-    while (timer.read_ms() < COLLECTION_TIME_MS){
+    while (timer.read_ms() < collection_time_ms){
         if (can2.read(myMessage)) {
             if (myMessage.id != 0){
         counterID[myMessage.id]++; // counts number IDs that have passed
