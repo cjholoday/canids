@@ -29,13 +29,12 @@ This README would normally document whatever steps are necessary to get your app
 
 ### Reading Can Messages and Frequency, Phase 1 ###
 
-* The reading Can Messages and Frequency program is for the car/automaker to do once 
-* and store the data. We are storing it in a .txt file.
-* The .txt file composes the CAN ID and the frequency of the CAN ID over a user defined
-* time period.
+* The reading Can Messages and Frequency program is for the car/automaker to do once and store the data. 
+* We are storing it in a .txt file.
+* The .txt file composes the CAN ID and the frequency of the CAN ID over a user defined period of time.
 
 ### Detection and Alerts, Phase 2 ###
 
 * We are creating a hash table to temporarily store the information from phase 1.
-* We compare the frequencies from the hash table and the current frequencies being 
-* read in. Then decide whether to send an alert that the system is hacked or not.
+* We compare the frequencies from the hash table and the current frequencies being read in. 
+* Then decide whether to send an alert that the system is hacked or not.
