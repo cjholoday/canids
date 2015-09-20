@@ -1,7 +1,6 @@
 #include "mbed.h"
 #include "ecu_reader.h"
 #include "globals.h"
-//#include "time.h"
 
 
 // Use a timer to see if things take too long
@@ -22,11 +21,7 @@ unsigned char ecu_reader::request(void)
     float engine_data = 67.4;
         
     led1 = 1;
-  
-    /*
-    can_msg[0] = 0x02;  
-    can_msg[1] = 0x01;
-    can_msg[2] = pid; */ 
+     
     can_msg[0] = 0x0;  
     can_msg[1] = 0x0;
     can_msg[2] = ENGINE_RPM; 
