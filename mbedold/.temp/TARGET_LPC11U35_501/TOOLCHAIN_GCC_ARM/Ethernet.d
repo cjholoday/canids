@@ -1,0 +1,19 @@
+/home/parallels/mbed/build/mbed/.temp/TARGET_LPC11U35_501/TOOLCHAIN_GCC_ARM/./Ethernet.o: \
+ /home/parallels/mbed/libraries/mbed/common/Ethernet.cpp \
+ /home/parallels/mbed/build/mbed/Ethernet.h \
+ /home/parallels/mbed/build/mbed/platform.h \
+ /home/parallels/mbed/build/mbed/TARGET_LPC11U35_501/TARGET_NXP/TARGET_LPC11UXX/TARGET_MCU_LPC11U35_501/TARGET_LPC11U35_501/device.h \
+ /home/parallels/mbed/build/mbed/TARGET_LPC11U35_501/TARGET_NXP/TARGET_LPC11UXX/objects.h \
+ /home/parallels/mbed/build/mbed/TARGET_LPC11U35_501/cmsis.h \
+ /home/parallels/mbed/build/mbed/TARGET_LPC11U35_501/LPC11Uxx.h \
+ /home/parallels/mbed/build/mbed/TARGET_LPC11U35_501/core_cm0.h \
+ /home/parallels/mbed/build/mbed/TARGET_LPC11U35_501/core_cmInstr.h \
+ /home/parallels/mbed/build/mbed/TARGET_LPC11U35_501/core_cmFunc.h \
+ /home/parallels/mbed/build/mbed/TARGET_LPC11U35_501/system_LPC11Uxx.h \
+ /home/parallels/mbed/build/mbed/TARGET_LPC11U35_501/cmsis_nvic.h \
+ /home/parallels/mbed/build/mbed/TARGET_LPC11U35_501/cmsis.h \
+ /home/parallels/mbed/build/mbed/TARGET_LPC11U35_501/TARGET_NXP/TARGET_LPC11UXX/PortNames.h \
+ /home/parallels/mbed/build/mbed/TARGET_LPC11U35_501/TARGET_NXP/TARGET_LPC11UXX/TARGET_MCU_LPC11U35_501/PeripheralNames.h \
+ /home/parallels/mbed/build/mbed/TARGET_LPC11U35_501/TARGET_NXP/TARGET_LPC11UXX/TARGET_MCU_LPC11U35_501/TARGET_LPC11U35_501/PinNames.h \
+ /home/parallels/mbed/build/mbed/TARGET_LPC11U35_501/TARGET_NXP/TARGET_LPC11UXX/gpio_object.h \
+ /home/parallels/mbed/build/mbed/mbed_assert.h
