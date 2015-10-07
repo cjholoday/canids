@@ -3,6 +3,8 @@
 
 #include "mbed.h"
 
+#define ARRAY_SIZE 0x7FF 
+
 
 extern DigitalOut led1;
 extern DigitalOut led2;

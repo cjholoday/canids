@@ -23,10 +23,8 @@ accept liability for any damage arising from its use.
 #include "ecu_reader.h"
 #include "globals.h"
 #include "TextLCD.h"
-#include "GPS.h"
 #include "SDFileSystem.h"
 
-GPS gps(p28, p27);
 TextLCD lcd(p18, p19, p20, p17, p16, p15, p14); // rs, rw, e, d0, d1, d2, d3
 SDFileSystem sd(p5, p6, p7, p13, "sd");
 
@@ -39,7 +37,6 @@ Serial pc(USBTX, USBRX);
 
 
 ecu_reader obdii(CANSPEED_500);     //Create object and set CAN speed
-void gps_demo(void);
 void sd_demo(void);
 
 int main() {
@@ -74,7 +71,6 @@ int main() {
     while(1)    // Wait until option is selected by the joystick
     {
    
-        if(down == 0) gps_demo();
         if(left == 0) sd_demo();
                
         if(up == 0) break;
@@ -114,34 +110,6 @@ int main() {
         }   
        
     }
-}
-
-void gps_demo(void)
-{
-    lcd.cls();
-    lcd.printf("GPS demo");
-    lcd.locate(0,1);
-    lcd.printf("Waiting for lock");
- 
-    wait(3);    
-    lcd.cls();
-   
-    while(1)
-    {
-      if(gps.sample()) {
-         lcd.cls();
-        lcd.printf("Long:%f", gps.longitude);
-           lcd.locate(0,1);
-        lcd.printf("Lat:%f", gps.latitude);
-            pc.printf("I'm at %f, %f\n", gps.longitude, gps.latitude);
-        } else {
-            pc.printf("Oh Dear! No lock :(\n");
-            lcd.cls();
-            lcd.printf("Waiting for lock");
-   
-        }
-    }
- 
 }
 
 void sd_demo(void)

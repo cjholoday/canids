@@ -6,25 +6,45 @@
 #include "TextLCD.h"
 #include "GPS.h"
 #include "SDFileSystem.h"
+#include "globals.h"
 #include <errno.h> //system error numbers
 
-#define CANDUMP_PATH "/sd/messagestore.txt"
-#define ARRAY_SIZE 0x7FF // 2048 bits for all common hexcode
-#define COLLECTION_TIME_MS 5000
+void calculateFrequencies(){}
 
-//for unordered_map
-using namespace std;
+void detectMsg(){
+    ID all_IDs[ARRAY_SIZE]; 
+    ID blank;
+    blank.count = -1;
+    memset(all_IDs, 0, ARRAY_SIZE);
+    CANMessage current;
 
-TextLCD lcd(p18, p19, p20, p17, p16, p15, p14); // rs, rw, e, d0, d1, d2, d3
-SDFileSystem sd(p5, p6, p7, p13, "sd");
+    while (1){
+        if (can2.read(current)) {
+            if (current.id != 0){
+            	if(all_IDs[current.id].count == -1){
+            		ID new_ID;
+            		new_ID.count = 1;
+            		new_ID.msg = current;
 
-Serial pc(USBTX, USBRX);
-
-ecu_reader obdii(CANSPEED_500);     //Create object and set CAN speed
-
-int main() {
-
-    pc.baud(115200);
-
-    detectFrequencies();
+            		all_IDs[current.id] = new_ID;
+            		continue;
+            	}
+            	if(++(all_IDs[current.id].count) >= 10){
+            		int freq = calculateFrequencies(all_IDs[current.id]);
+            		if (freq){
+            			continue;
+            		}
+            		/*
+            		Compare freq with look up table, if bad then call mitigate.
+            		*/
+            	}
+        	}
+        }
+    }
+    
 }
+
+void mitigate(){
+
+}
+
