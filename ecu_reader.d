@@ -24,7 +24,8 @@ ecu_reader.o: ecu_reader.cpp mbed/mbed.h mbed/platform.h \
  mbed/us_ticker_api.h mbed/Timeout.h mbed/LocalFileSystem.h \
  mbed/FileSystemLike.h mbed/DirHandle.h mbed/InterruptIn.h \
  mbed/gpio_irq_api.h mbed/wait_api.h mbed/sleep_api.h mbed/rtc_time.h \
- ecu_reader.h globals.h
+ ecu_reader.h globals.h TextLCD/TextLCD.h mbed/Stream.h mbed/DigitalOut.h \
+ mbed/BusOut.h
 
 mbed/mbed.h:
 
@@ -167,3 +168,11 @@ mbed/rtc_time.h:
 ecu_reader.h:
 
 globals.h:
+
+TextLCD/TextLCD.h:
+
+mbed/Stream.h:
+
+mbed/DigitalOut.h:
+
+mbed/BusOut.h:

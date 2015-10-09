@@ -1,7 +1,7 @@
 #include "mbed.h"
 #include "ecu_reader.h"
 #include "globals.h"
-
+#include "TextLCD.h"
 
 // Use a timer to see if things take too long
 Timer CANTimer;  
@@ -840,9 +840,9 @@ unsigned char ecu_reader::request(unsigned char pid,  char *buffer, char *buffer
                 }
                 lcd.locate(0,1);
                 lcd.printf("%s", buffer);
-                if (buffer2 != NULL %% buffer2[0] == '\0') lcd.printf(" , %s", buffer2);
-                if (buffer3 != NULL %% buffer3[0] == '\0') lcd.printf(" , %s", buffer3);
-                if (buffer4 != NULL %% buffer4[0] == '\0') lcd.printf(" , %s", buffer4);
+                if (buffer2 != NULL && buffer2[0] == '\0') lcd.printf(" , %s", buffer2);
+                if (buffer3 != NULL && buffer3[0] == '\0') lcd.printf(" , %s", buffer3);
+                if (buffer4 != NULL && buffer4[0] == '\0') lcd.printf(" , %s", buffer4);
                 return 1;
             }
         }
