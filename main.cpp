@@ -22,19 +22,6 @@ accept liability for any damage arising from its use.
 #include "mbed.h"
 #include "ecu_reader.h"
 #include "globals.h"
-#include "TextLCD.h"
-#include "SDFileSystem.h"
-
-//TextLCD lcd(p18, p19, p20, p17, p16, p15, p14); // rs, rw, e, d0, d1, d2, d3
-SDFileSystem sd(p5, p6, p7, p13, "sd");
-
-DigitalIn click(p21);   // Joystick inputs
-DigitalIn right(p22);
-DigitalIn down(p23);
-DigitalIn left(p24);
-DigitalIn up(p25);
-//Serial pc(USBTX, USBRX);
-
 
 ecu_reader obdii(CANSPEED_500);     //Create object and set CAN speed
 void sd_demo(void);
@@ -88,7 +75,7 @@ int main() {
         {
             lcd.locate(0,0);
             lcd.printf(buffer);
-              pc.printf(buffer);
+            pc.printf(buffer);
         }   
          
         if(obdii.request(ENGINE_COOLANT_TEMP,buffer,NULL,NULL,NULL) == 1)

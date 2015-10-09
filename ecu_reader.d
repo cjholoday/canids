@@ -25,7 +25,9 @@ ecu_reader.o: ecu_reader.cpp mbed/mbed.h mbed/platform.h \
  mbed/FileSystemLike.h mbed/DirHandle.h mbed/InterruptIn.h \
  mbed/gpio_irq_api.h mbed/wait_api.h mbed/sleep_api.h mbed/rtc_time.h \
  ecu_reader.h globals.h TextLCD/TextLCD.h mbed/Stream.h mbed/DigitalOut.h \
- mbed/BusOut.h
+ mbed/BusOut.h fat/SDFileSystem.h fat/FATFileSystem.h \
+ mbed/FileSystemLike.h mbed/FileHandle.h fat/ChaN/ff.h fat/ChaN/integer.h \
+ fat/ChaN/ffconf.h
 
 mbed/mbed.h:
 
@@ -176,3 +178,17 @@ mbed/Stream.h:
 mbed/DigitalOut.h:
 
 mbed/BusOut.h:
+
+fat/SDFileSystem.h:
+
+fat/FATFileSystem.h:
+
+mbed/FileSystemLike.h:
+
+mbed/FileHandle.h:
+
+fat/ChaN/ff.h:
+
+fat/ChaN/integer.h:
+
+fat/ChaN/ffconf.h:
