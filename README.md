@@ -35,6 +35,6 @@ This README would normally document whatever steps are necessary to get your app
 
 ### Detection and Alerts, Phase 2 ###
 
-* We are creating a hash table to temporarily store the information from phase 1.
+* We are creating a map to temporarily store the information from phase 1.
 * We compare the frequencies from the hash table and the current frequencies being read in. 
 * Then decide whether to send an alert that the system is hacked or not.
