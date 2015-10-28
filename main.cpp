@@ -37,23 +37,23 @@ int main() {
     left.mode(PullUp);
     up.mode(PullUp);
     
-    printf("ECU Reader \n"); 
+    //printf("Automotive IDS \n"); 
     lcd.locate(0,0);                // Set LCD cursor position
-    lcd.printf("CAN-Bus demo");
+    lcd.printf("Automotive IDS");
     
     lcd.locate(0,1);
-    lcd.printf("www.google.com");
+    lcd.printf("UMTRI");
        
-    pc.printf("\n\rCAN-bus demo...");
+    pc.printf("\n\rAutomotive IDS initializing...");
     
     wait(3);
     lcd.cls();
     lcd.printf("Use joystick");
 
     lcd.locate(0,1);
-    lcd.printf("U-CAN:D-GPS:L-SD");
+    lcd.printf("U-CAN:L-SD");
     
-    pc.printf("\nU-CAN:D-GPS:L-SD");
+    pc.printf("\nU-CAN:L-SD");
 
     while(1)    // Wait until option is selected by the joystick
     {
@@ -66,9 +66,9 @@ int main() {
     lcd.cls();
 
     while(1) {  // Main CAN loop
-        led2 = 1;
+        led2 = !led2;
         wait(0.1);
-        led2 = 0;
+        led2 = !led2;
         wait(0.1);
         
         if(obdii.request(ENGINE_RPM,buffer,NULL,NULL,NULL) == 1)   // Get engine rpm and display on LCD
