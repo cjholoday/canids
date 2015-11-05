@@ -4,6 +4,7 @@
 #include "mbed.h"
 #include "TextLCD.h"
 #include "SDFileSystem.h"
+#include <unordered_map>
 
 #define ARRAY_SIZE 0x7FF 
 

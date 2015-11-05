@@ -7,13 +7,12 @@
 #include "SDFileSystem.h"
 #include <errno.h> //system error numbers
 #include <fstream>
-#include <unordered_map>
 #include <string>
 
 using namespace std;
 
 //for unordered_map
-int main(){
+void doMapping(){
 	ifstream file;
 	double frequency;
 	string identifierCAN;
