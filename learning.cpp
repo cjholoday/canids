@@ -20,15 +20,28 @@ SDFileSystem sd(p5, p6, p7, p13, "sd");
 Serial pc(USBTX, USBRX);
 
 ecu_reader obdii(CANSPEED_500);     //Create object and set CAN speed
-
+/*
 int main() {
 
     pc.baud(115200);
 
     message_reader();
+}*/
+
+void storeMessages(FILE *fp){
+    ifstream file;
+    double frequency;
+    string identifierCAN;
+
+    while (file >> identifierCAN) {
+        file >> frequency;
+        map.insert({identifierCAN, frequency}); 
+    }
+
 }
 
-void message_reader(){
+void messageReader(){
+    ran_learning = true;
     int counterID[ARRAY_SIZE]; // preallocates memory  for the hexcode ID
     for(int i = 0; i < ARRAY_SIZE; i++){
         counterID[i] = 0; // creates the hexcode ID
@@ -51,6 +64,8 @@ void message_reader(){
             Write store_messages()
             Call that instead of storing in text file below
     */
+
+
     FILE *fp = fopen(CANDUMP_PATH, "w"); // create a writable file "messagestore"
     lcd.locate(0,1);
     if (fp == NULL){

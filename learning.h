@@ -11,8 +11,9 @@ struct frequency_struct {
 //Counts number of expected frequency per CAN packet
 void messageReader();
 
-//Stores the expected frequencies in frequencies
 void storeMessages();
+//boolean to indicate learning algorithm ran. 
+bool ran_learning;
 
 unordered_map<unsigned int, frequency_struct> frequencies;
 

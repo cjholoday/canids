@@ -27,7 +27,7 @@ detect.o: detect.cpp learning.h detect.h mbed/mbed.h mbed/platform.h \
  ecu_reader.h globals.h TextLCD/TextLCD.h mbed/Stream.h mbed/DigitalOut.h \
  mbed/BusOut.h fat/SDFileSystem.h fat/FATFileSystem.h \
  mbed/FileSystemLike.h mbed/FileHandle.h fat/ChaN/ff.h fat/ChaN/integer.h \
- fat/ChaN/ffconf.h GPS/GPS.h
+ fat/ChaN/ffconf.h
 
 learning.h:
 
@@ -196,5 +196,3 @@ fat/ChaN/ff.h:
 fat/ChaN/integer.h:
 
 fat/ChaN/ffconf.h:
-
-GPS/GPS.h:

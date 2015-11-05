@@ -7,6 +7,8 @@
 
 #define ARRAY_SIZE 0x7FF 
 
+extern Timer timer;
+
 extern Serial pc;
 extern TextLCD lcd;
 extern SDFileSystem sd;
