@@ -13,13 +13,6 @@
 
 //for unordered_map
 using namespace std;
-
-TextLCD lcd(p18, p19, p20, p17, p16, p15, p14); // rs, rw, e, d0, d1, d2, d3
-SDFileSystem sd(p5, p6, p7, p13, "sd");
-
-Serial pc(USBTX, USBRX);
-
-ecu_reader obdii(CANSPEED_500);     //Create object and set CAN speed
 /*
 int main() {
 
@@ -29,7 +22,23 @@ int main() {
 }*/
 
 void storeMessages(FILE *fp){
-    ifstream file;
+    double frequency;
+    int CAN_ID;
+    int num = sizeof(double) + sizeof(unsigned int);
+    char * buf = new char[num];
+    memset(buf, 0, num);
+    while (! feof (fp)){
+        if (fgets(buf, sizeof(unsigned int), fp) == NULL)
+            break;
+        CAN_ID = int(buf);
+
+        if (fgets(buf, sizeof(double), fp) == NULL)
+            break;
+        frequency = atof(buf);
+
+        frequencies[CAN_ID] = frequency;
+    }
+/*    ifstream file;
     double frequency;
     string identifierCAN;
 
@@ -37,7 +46,7 @@ void storeMessages(FILE *fp){
         file >> frequency;
         map.insert({identifierCAN, frequency}); 
     }
-
+*/
 }
 
 void messageReader(){
@@ -59,13 +68,6 @@ void messageReader(){
     
     timer.stop();
 
-    /*
-        TO DO:
-            Write store_messages()
-            Call that instead of storing in text file below
-    */
-
-
     FILE *fp = fopen(CANDUMP_PATH, "w"); // create a writable file "messagestore"
     lcd.locate(0,1);
     if (fp == NULL){
@@ -78,8 +80,10 @@ void messageReader(){
     lcd.printf("%f\t\n", totTime);
     for (unsigned int id = 0; id < ARRAY_SIZE; id++){
         //fprintf(fp,"0x%x \t\t 0x%x \t\t %f\n", id,counterID[id],counterID[id]/totTime*1000);
-        fprintf(fp,"%x %f\n", id, counterID[id]/totTime); // prints ID and ID frequancy
+        fprintf(fp,"%x %f\n", id, double(counterID[id]/totTime)); // prints ID and ID frequancy
     }
+
+    storeMessages(fp);
 
     fclose(fp);
     lcd.cls();

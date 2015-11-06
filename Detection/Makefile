@@ -3,7 +3,7 @@
 
 GCC_BIN = 
 PROJECT = ecu_reader
-OBJECTS = ./globals.o ./ecu_reader.o ./main.o ./detect.o learning ./TextLCD/TextLCD.o ./GPS/GPS.o 
+OBJECTS = ./globals.o ./ecu_reader.o ./main.o ./detect.o ./learning.o ./TextLCD/TextLCD.o ./GPS/GPS.o 
 SYS_OBJECTS = ./mbed/TARGET_LPC1768/TOOLCHAIN_GCC_ARM/startup_LPC17xx.o ./mbed/TARGET_LPC1768/TOOLCHAIN_GCC_ARM/system_LPC17xx.o ./mbed/TARGET_LPC1768/TOOLCHAIN_GCC_ARM/board.o ./mbed/TARGET_LPC1768/TOOLCHAIN_GCC_ARM/retarget.o ./mbed/TARGET_LPC1768/TOOLCHAIN_GCC_ARM/cmsis_nvic.o
 ASLDFKJAF = ./mbed/TARGET_LPC1768/TOOLCHAIN_GCC_ARM/cmsis_nvic.o ./mbed/TARGET_LPC1768/TOOLCHAIN_GCC_ARM/system_LPC17xx.o ./mbed/TARGET_LPC1768/TOOLCHAIN_GCC_ARM/core_cm3.o ./mbed/TARGET_LPC1768/TOOLCHAIN_GCC_ARM/stackheap.o ./mbed/TARGET_LPC1768/TOOLCHAIN_GCC_ARM/startup_LPC17xx.o 
 INCLUDE_PATHS = -I. -I./fat -I./fat/ChaN -I./mbed -I./mbed/LPC1768 -I./mbed/TARGET_LPC1768 -I./mbed/TARGET_LPC1768/TARGET_NXP/TARGET_LPC176X -I./mbed/TARGET_LPC1768/TARGET_NXP/TARGET_LPC176X/TARGET_MBED_LPC1768 -I./TextLCD -I./GPS 

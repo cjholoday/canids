@@ -30,4 +30,6 @@ extern CANMessage can_MsgRx;
 extern int PID020;
 extern int PID2140;
 extern int PID4160; //PID Support Masks
+
+extern unordered_map<unsigned int, double> frequencies;
 #endif
