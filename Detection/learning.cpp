@@ -2,9 +2,6 @@
 #include "mbed.h"
 #include "ecu_reader.h"
 #include "globals.h"
-#include "TextLCD.h"
-#include "GPS.h"
-#include "SDFileSystem.h"
 #include <errno.h> //system error numbers
 
 #define CANDUMP_PATH "/sd/messagestore.txt"
@@ -13,15 +10,10 @@
 
 //for unordered_map
 using namespace std;
-/*
-int main() {
-
-    pc.baud(115200);
-
-    message_reader();
-}*/
 
 void storeMessages(FILE *fp){
+    lcd.locate(0,1);
+    lcd.printf("Storage starting");
     double frequency;
     int CAN_ID;
     int num = sizeof(double) + sizeof(unsigned int);
@@ -38,19 +30,13 @@ void storeMessages(FILE *fp){
 
         frequencies[CAN_ID] = frequency;
     }
-/*    ifstream file;
-    double frequency;
-    string identifierCAN;
-
-    while (file >> identifierCAN) {
-        file >> frequency;
-        map.insert({identifierCAN, frequency}); 
-    }
-*/
+    lcd.locate(0,0);
+    lcd.printf("Storage completed");
 }
 
 void messageReader(){
-    ran_learning = true;
+    lcd.locate(0,0);
+    lcd.printf("Reader beginning");
     int counterID[ARRAY_SIZE]; // preallocates memory  for the hexcode ID
     for(int i = 0; i < ARRAY_SIZE; i++){
         counterID[i] = 0; // creates the hexcode ID
@@ -83,6 +69,8 @@ void messageReader(){
         fprintf(fp,"%x %f\n", id, double(counterID[id]/totTime)); // prints ID and ID frequancy
     }
 
+    lcd.locate(0,1);
+    lcd.printf("calling storage");
     storeMessages(fp);
 
     fclose(fp);

@@ -19,3 +19,7 @@ DigitalIn up(p25);
 CAN can2(p30, p29);
 CANMessage can_MsgRx;
 int PID020, PID2140, PID4160;
+
+Timer timer;
+
+unordered_map<int, double> frequencies;

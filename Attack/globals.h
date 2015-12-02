@@ -8,7 +8,7 @@
 
 #define ARRAY_SIZE 0x7FF 
 
-extern Timer timer;
+unordered_map<int, double> frequencies;
 
 extern Serial pc;
 extern TextLCD lcd;
@@ -30,4 +30,4 @@ extern CANMessage can_MsgRx;
 extern int PID020;
 extern int PID2140;
 extern int PID4160; //PID Support Masks
-#endif
+#endif // GLOBALS_H_
