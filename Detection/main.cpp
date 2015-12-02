@@ -22,6 +22,8 @@ accept liability for any damage arising from its use.
 #include "mbed.h"
 #include "ecu_reader.h"
 #include "globals.h"
+#include "learning.h"
+#include "detect.h"
 
 ecu_reader obdii(CANSPEED_500);     //Create object and set CAN speed
 void sd_demo(void);
@@ -54,13 +56,14 @@ int main() {
     lcd.printf("U-CAN:L-SD");
     
     pc.printf("\nU-CAN:L-SD");
+    messageReader();
 
     while(1)    // Wait until option is selected by the joystick
-    {
-   
-        if(left == 0) sd_demo();
-               
-        if(up == 0) break;
+    {        
+
+        if (right == 0){
+            detectMsg();
+        }
         
     }
     lcd.cls();

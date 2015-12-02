@@ -8,11 +8,15 @@
 
 #define ARRAY_SIZE 0x7FF 
 
+<<<<<<< HEAD
 #define CANSPEED_125      125000        // CAN speed at 125 kbps
 #define CANSPEED_250      250000        // CAN speed at 250 kbps
 #define CANSPEED_500      500000        // CAN speed at 500 kbps
 
 extern Timer timer;
+=======
+unordered_map<int, double> frequencies;
+>>>>>>> 82066e09817ed3057ccfc59603c37002b7cb4aa2
 
 extern Serial pc;
 extern TextLCD lcd;
@@ -34,4 +38,4 @@ extern CANMessage can_MsgRx;
 extern int PID020;
 extern int PID2140;
 extern int PID4160; //PID Support Masks
-#endif
+#endif // GLOBALS_H_

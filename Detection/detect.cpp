@@ -7,14 +7,18 @@
 #include <errno.h> //system error numbers
 
 void detectMsg(){
+    lcd.locate(0,0);
+    lcd.printf("Begin detection");
     ID all_IDs[ARRAY_SIZE]; 
     ID blank;
     blank.count = -1;
     memset(all_IDs, 0, ARRAY_SIZE);
     CANMessage current;
-
     timer.start();
     while (1){
+
+        
+        lcd.printf("In loop");
         if (can2.read(current)) {
             if (current.id != 0){
                 if(all_IDs[current.id].count == -1){
