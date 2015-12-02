@@ -4,7 +4,7 @@ This README would normally document whatever steps are necessary to get your app
 
 ### What is this repository for? ###
 
-* ecu_reader
+* mdp_attacker
 * Version 1.0
 
 ### Contribution guidelines ###

