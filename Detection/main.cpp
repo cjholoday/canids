@@ -26,7 +26,6 @@ accept liability for any damage arising from its use.
 #include "detect.h"
 
 ecu_reader obdii(CANSPEED_500);     //Create object and set CAN speed
-void sd_demo(void);
 
 int main() {
     pc.baud(115200);
@@ -51,11 +50,6 @@ int main() {
     wait(3);
     lcd.cls();
     lcd.printf("Use joystick");
-
-    lcd.locate(0,1);
-    lcd.printf("U-CAN:L-SD");
-    
-    pc.printf("\nU-CAN:L-SD");
     messageReader();
 
     while(1)    // Wait until option is selected by the joystick
@@ -100,35 +94,4 @@ int main() {
         }   
        
     }
-}
-
-void sd_demo(void)
-{
-    lcd.cls();
-     printf("\nSD demo");
-    lcd.printf("SD demo");
-    wait(2);      
-    lcd.cls();
-    
-    FILE *fp = fopen("/sd/sdtest2.txt", "w");
-    if(fp == NULL) {
-        lcd.cls();
-        lcd.printf("Could not open file for write\n");
-         pc.printf("\nCould not open file for write");
-    }
-    fprintf(fp, "Hello fun SD Card World! testing 1234");
-    fclose(fp); 
-    lcd.locate(0,1);
-    lcd.printf("Writtern to SD card");
-    pc.printf("\nWrittern to SD card");
-        
-    while(1)
-    {
-        led2 = 1;
-        wait(0.1);
-        led2 = 0;
-        wait(0.1);
-   
-    }
- 
 }

@@ -13,30 +13,39 @@ void detectMsg(){
     ID blank;
     blank.count = -1;
     memset(all_IDs, 0, ARRAY_SIZE);
-    CANMessage current;
+    CANMessage current;	
     timer.start();
+
     while (1){
 
         
         lcd.printf("In loop");
         if (can2.read(current)) {
             if (current.id != 0){
+
+		//If we haven't seen this CAN message yet, add it to the table of seen messages
                 if(all_IDs[current.id].count == -1){
                     ID new_ID;
                     new_ID.count = 1;
                     new_ID.msg = current;
-                    new_ID.start = timer.read_ms();
+                    new_ID.start = timer.read_ms();	//current time we have seen the message
 
                     all_IDs[current.id] = new_ID;
                     continue;
                 }
 
+		//If we have seen this message at least 10 times, then calculate its frequency
                 if(++(all_IDs[current.id].count) >= 10){
                     ID * cur = &(all_IDs[current.id]);
                     cur->end = timer.read_ms();
+
+		    /*
+		    * message frequency = (time first seen - time last seen) / (times message seen)
+ 	            */
                     double freq = (cur->start - cur->end) / cur->count;
                     double lower_bound = frequencies[current.id] * 0.9;
                     double upper_bound = frequencies[current.id] * 1.1;
+
                     if (lower_bound <= freq && freq <= upper_bound){
                         continue;
                     }
