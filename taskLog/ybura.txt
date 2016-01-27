@@ -1,0 +1,12 @@
+1/26/16
+Accomplished last week:
+	Began converting code in detection/ to be compatible w/ RbPi
+	Found CAN RbPi libs
+	
+To accomplish this week:
+	Finish converting code to be compatible w/ RbPi
+	Push task log template to git
+
+Objectives accomplished thus far:
+	Found CAN RbPi libs
+
