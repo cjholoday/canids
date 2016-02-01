@@ -1,0 +1,12 @@
+Date of current week 01/26/16:
+Accomplished last week:
+- Read car hackders handbook
+
+To accomplish this week:
+- Install OS on raspberrypi
+- Defined a schedule with milestones and deliverables
+- Continue reading suggested readings
+
+
+Objectives accomplished so far:
+- Read car hackers handbook

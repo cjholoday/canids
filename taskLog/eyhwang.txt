@@ -1,0 +1,12 @@
+Task Log for Eric Hwang (eyhwang)
+
+1/26/16 - 2/2/16
+Accomplished last week:
+	- Began reading the Opengarage handbook
+
+To accomplish this week:
+	- Define schedule with milestones and deliverables
+	- Install Raspbian onto the rasperrby pi's (if SD cards come in)
+
+Objectives accompished thus far:
+	- None
