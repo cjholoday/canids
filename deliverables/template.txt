@@ -1,0 +1,11 @@
+-Name the file "group.txt" (e.g. detection.txt)
+
+{Group member names}
+
+Deliverables:
+	Task	Estimated Completion date (e.g. Feb 01 2016)
+					(could be vague such as "first week of February")
+
+Milestones:
+	Task	Estimated Completion date
+
