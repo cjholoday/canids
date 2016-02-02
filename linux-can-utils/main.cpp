@@ -3,8 +3,9 @@
 #include <string.h>
 #include <unistd.h>
 
-#include <linux/ioctl.h>
-#include <linux/if_tun.h>
+#include <net/if.h>
+#include <sys/ioctl.h>
+
 #include <linux/can.h>
 #include <linux/can/raw.h>
 
@@ -18,7 +19,7 @@ int main() {
     return 0;
 }
 
-int send(char* buff, int &s){
+int send(char buff[], int &s){
 	struct can_frame frame;
 	int nbytes;
 
