@@ -1,0 +1,13 @@
+Eric Hwang, Marie Angle, Nathan Samoy
+
+Deliverables:
+	- Detect an attack on the device, implementing from learning phase
+	  (Apr 18, 2016)
+
+Milestones:
+	- Test and debug current code (Feb 29, 2016)
+	- learn to work with raspberry pi's (Feb 29, 2016)
+	- brainstorm better ways to detect / 
+	  explore possibility of validating CAN packets (Feb 29, 2016)
+	- Take information from learning phase, implement learning phase 
+	  prototype (Mar 31, 2016)
