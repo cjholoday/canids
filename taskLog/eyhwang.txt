@@ -1,5 +1,19 @@
 Task Log for Eric Hwang (eyhwang)
 
+2/9/16 - 2/16/16
+Accomplished last week:
+	- Installed Raspbian onto Raspberry Pi's
+
+To accomplish this week:
+	- Research debugging environment for Raspberry pi's
+	- Work towards first Detection Team milestone
+
+Objectives accomplished thus far:
+	- Installed Raspbian on Raspberry Pi's
+	- Read Opengarage handbook
+	- Defined schedule of milestones and deliverables
+
+
 2/2/16 - 2/9/16
 Accomplished last week:
 	- Finished reading the Opengarage handbook
