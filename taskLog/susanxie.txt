@@ -1,0 +1,11 @@
+Date of current week 01/26/16:
+
+Accomplished last week:
+	-Began reading carhackers handbook
+
+To accomplish this week:
+	-Continue reading handbook
+	-Try understand the code
+
+Objectives accomplished so far:
+  None
