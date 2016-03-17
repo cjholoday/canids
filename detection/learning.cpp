@@ -3,8 +3,10 @@
 //#include "ecu_reader.h"
 #include "globals.h"
 #include <errno.h> //system error numbers
-#include "can-utils/include/linux/can.h"
+#include "../can-utils/include/linux/can.h"
+#include "linux/socket.h"
 #include "stdio.h"
+#include "string.h"
 
 //change the path?
 #define CANDUMP_PATH "/sd/messagestore.txt"
