@@ -1,9 +1,12 @@
 #include "learning.h"
-#include "mbed.h"
-#include "ecu_reader.h"
+//#include "mbed.h"
+//#include "ecu_reader.h"
 #include "globals.h"
 #include <errno.h> //system error numbers
+#include "can-utils/include/linux/can.h"
+#include "stdio.h"
 
+//change the path?
 #define CANDUMP_PATH "/sd/messagestore.txt"
 #define ARRAY_SIZE 0x7FF // 2048 bits for all common hexcode
 #define COLLECTION_TIME_MS 5000
@@ -12,8 +15,8 @@
 using namespace std;
 
 void storeMessages(FILE *fp){
-    lcd.locate(0,1);
-    lcd.printf("Storage starting");
+    //lcd.locate(0,1);
+    printf("Storage starting");
     double frequency;
     int CAN_ID;
     int num = sizeof(double) + sizeof(unsigned int);
@@ -30,18 +33,31 @@ void storeMessages(FILE *fp){
 
         frequencies[CAN_ID] = frequency;
     }
-    lcd.locate(0,0);
-    lcd.printf("Storage completed");
+    //lcd.locate(0,0);
+    printf("Storage completed");
 }
 
 void messageReader(){
-    lcd.locate(0,0);
-    lcd.printf("Reader beginning");
-    int counterID[ARRAY_SIZE]; // preallocates memory  for the hexcode ID
-    for(int i = 0; i < ARRAY_SIZE; i++){
+    //lcd.locate(0,0);
+    printf("Reader beginning");
+    canid_t counterID[ARRAY_SIZE]; // preallocates memory  for the hexcode ID
+    for(unsigned int i = 0; i < ARRAY_SIZE; i++){
         counterID[i] = 0; // creates the hexcode ID
     }
     timer.start(); //Start the timer
+    
+    //copied from can.txt, creating and binding a socket s
+    int s;
+    struct sockaddr_can addr; 
+    struct ifreq ifr;
+    s = socket(PF_CAN, SOCK_RAW, CAN_RAW);
+    strcpy(ifr.ifr_name, "can0" ); //where is can0? or should it be can2?
+    ioctl(s, SIOCGIFINDEX, &ifr);
+    addr.can_family = AF_CAN; 
+    addr.can_ifindex = ifr.ifr_ifindex;
+    bind(s, (struct sockaddr *)&addr, sizeof(addr));
+    
+    /* change below
     CANMessage myMessage;
     while (timer.read_ms() < COLLECTION_TIME_MS){
         if (can2.read(myMessage)) {
@@ -50,33 +66,52 @@ void messageReader(){
         }
         led1 = !led1; // led flash while in use
         }
+    } */
+
+    struct can_frame frame;
+    while (timer.read_ms() < COLLECTION_TIME_MS){
+	    nbytes = read(s, &frame, sizeof(struct can_frame));
+	    if (nbytes < 0) {
+		    perror("can raw socket read");
+		    return 1;
+	    }
+	    /* paranoid check ... */
+	    if (nbytes < sizeof(struct can_frame)) {
+		    fprintf(stderr, "read: incomplete CAN frame\n"); 
+		    return 1;
+	    }
+	    /* do something with the received CAN frame */
+	    if (frame.can_id != 0){
+		    counterID[frame.can_id]++;
+	    }
+	    //led flash? (can use gpio pins if have to)
     }
-    
+
     timer.stop();
 
     FILE *fp = fopen(CANDUMP_PATH, "w"); // create a writable file "messagestore"
-    lcd.locate(0,1);
+    //lcd.locate(0,1);
     if (fp == NULL){
-        lcd.printf("file open failed %d", errno);
+        printf("file open failed %d", errno);
     return;
     }
     
     double totTime;
     totTime = timer.read_ms(); // read time lapse in milliseconds
-    lcd.printf("%f\t\n", totTime);
+    printf("%f\t\n", totTime);
     for (unsigned int id = 0; id < ARRAY_SIZE; id++){
         //fprintf(fp,"0x%x \t\t 0x%x \t\t %f\n", id,counterID[id],counterID[id]/totTime*1000);
         fprintf(fp,"%x %f\n", id, double(counterID[id]/totTime)); // prints ID and ID frequancy
     }
 
-    lcd.locate(0,1);
-    lcd.printf("calling storage");
+    //locate(0,1);
+    printf("calling storage");
     storeMessages(fp);
 
     fclose(fp);
-    lcd.cls();
-    lcd.locate(0,0);
-    lcd.printf("file completed");
+    //lcd.cls();
+    //lcd.locate(0,0);
+    printf("file completed");
     
     //template file written, complete more tasks
 }
