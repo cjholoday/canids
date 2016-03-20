@@ -3,7 +3,7 @@
 using namespace std;
 
 //Counts number of expected frequency per CAN packet
-void messageReader();
+int messageReader();
 
 void storeMessages();
 

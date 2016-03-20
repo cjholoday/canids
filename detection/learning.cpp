@@ -6,8 +6,12 @@
 #include "linux/can.h"
 #include "sys/socket.h"
 #include "sys/types.h"
+#include "sys/ioctl.h"
+#include "net/if.h"
 #include "stdio.h"
 #include "string.h"
+#include "stdlib.h"
+#include "unistd.h"
 
 //change the path?
 #define CANDUMP_PATH "/sd/messagestore.txt"
@@ -76,7 +80,7 @@ int messageReader(){
 
     struct can_frame frame;
     while (1){
-	    nbytes = read(s, &frame, sizeof(struct can_frame));
+	    ssize_t nbytes = read(s, &frame, sizeof(struct can_frame));
 	    if (nbytes < 0) {
 		    perror("can raw socket read");
 		    return 1;
