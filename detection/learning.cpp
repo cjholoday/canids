@@ -96,7 +96,6 @@ int messageReader(){
 	    }
 	    end = clock();
 	    if ((end - start) / CLOCKS_PER_SEC >= COLLECTION_TIME_SEC) break;
-	    start = end;
 	    //led flash? (can use gpio pins if have to)
     }
 

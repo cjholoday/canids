@@ -3,13 +3,13 @@
 
 #include <unordered_map>
 //#include "CAN.h"
-#include <time.h>
+//#include <time.h>
 
 #define ARRAY_SIZE 0x7FF 
 
 extern unordered_map<int, double> frequencies;
 //extern CAN can;
-extern time_t timer;
+//extern time_t timer;
 
 
 #endif // GLOBALS_H_

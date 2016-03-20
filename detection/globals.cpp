@@ -1,6 +1,6 @@
 #include "globals.h"
 
-CAN can = CAN();
+//CAN can = CAN();
 unordered_map<int, double> frequencies;
 
-time_t timer;
+//time_t timer;
