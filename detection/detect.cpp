@@ -4,63 +4,75 @@
 #include <memory>
 #include <ctime>
 #include <stdlib.h>
+#include "../can-utils/lib.h"
 
 void detectMsg(){
     printf("Begin detection");
 
-    infoID all_IDs[ARRAY_SIZE]
-    memset(all_IDs, 0, ARRAY_SIZE);
+    std::map<canid_t, infoID> all_IDs;
+
     std::clock_t start;
 
     start = std::clock();
 
+    struct sockaddr_can addr;
+    struct ifreq ifr;
+    socklen_t len = sizeof(addr);
+    struct can_frame frame;
+
+
     while (1){
 
+        can_bytes = recvfrom(s, &frame, sizeof(struct can_frame),
+                  0, (struct sockaddr*)&addr, &len);
+
+        /* get interface name of the received CAN frame */
+        ifr.ifr_ifindex = addr.can_ifindex;
+        ioctl(s, SIOCGIFNAME, &ifr);
+
+        if(can_bytes < 0) {
+            prerror("can raw socket read");
+            return 1;
+        }
+
+        if (can_bytes < sizeof(struct can_frame)) {
+            fprintf(stderr, "read: incomplete CAN frame\n");
+            return 1;
+        }
         
-        printf("In loop");
-        if (can.messageAvailable()) {
-            can.getMessage(&can.messageRx);
-            if (can.messageRx.id != 0){
-		        //If we haven't seen this CAN message yet, add it to the table of seen messages
-                if(infoID[can.messageRx.id] == -1){
-                    ID new_ID;
-                    new_ID.count = 1;
-                    new_ID.id = can.messageRx.id;
-                    new_ID.start = ( std::clock() - start ) / (double) CLOCKS_PER_SEC;	//current time we have seen the message
+        canid_t current_id = frame.can_id;
+        std::map<caN_id, infoID>::iterator it = all_IDs.find(current_id);
 
-                    all_IDs[current.id] = new_ID;
-                    continue;
-                }
+        //If we haven't seen this CAN message yet, add it to the table of seen messages
+        if(it == all_IDs.end()){
+            ID new_ID;
+            new_ID.count = 1;
+            new_ID.start = ( std::clock() - start ) / (double) CLOCKS_PER_SEC;	//current time we have seen the message
 
-		        //If we have seen this message at least 10 times, then calculate its frequency
-                if(++(all_IDs[current.id].count) >= 10){
-                    ID * cur = &(all_IDs[current.id]);
-                    cur->end = ( std::clock() - start ) / (double) CLOCKS_PER_SEC;
+            all_IDs[current_id] = new_ID;
+            continue;
+        }
 
-		            /*
-		            * message frequency = (time first seen - time last seen) / (times message seen)
- 	                */
-                    double freq = (cur->start - cur->end) / cur->count;
-                    double lower_bound = frequencies[current.id] * 0.9;
-                    double upper_bound = frequencies[current.id] * 1.1;
+        //If we have seen this message at least 10 times, then calculate its frequency
+        if(++(all_IDs[current_id].count) >= 10){
+            ID * cur = &(all_IDs[current.id]);
+            cur->end = ( std::clock() - start ) / (double) CLOCKS_PER_SEC;
 
-                    if (lower_bound <= freq && freq <= upper_bound){
-                        continue;
-                    }
-                    else{
-                        mitigate();
-                    }
-                }
+            /*
+            * message frequency = (time first seen - time last seen) / (times message seen)
+                */
+            double freq = (cur->start - cur->end) / cur->count;
+            double lower_bound = frequencies[current.id] * 0.9;
+            double upper_bound = frequencies[current.id] * 1.1;
+
+            if (lower_bound <= freq && freq <= upper_bound){
+                continue;
+            }
+            else{
+                printf("Attack detected");
             }
         }
     }
-    
 }
 
-void mitigate(){
-    for (int i = 0; i < 10; i++){
-        printf("Mitigating attack");
-        sleep(2000);
-    }
-}
 
