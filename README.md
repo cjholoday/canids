@@ -11,9 +11,9 @@
 
 ### Attack directory ###
 
-* Currently WIP
-* Should send CAN packets at high frequencies
-* Process for sending packets TBD since RbPi does not have built in joystick like mbed did
+* Uses cansend.c to send packets
+* Currently just spam messages in order to attack
+* Will look into fuzzing and replay attacks after initial testing phase
 
 ### Reading Can Messages and Frequency, Phase 1 ###
 
