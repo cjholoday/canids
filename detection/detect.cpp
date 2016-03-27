@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include "../can-utils/lib.h"
 
-void detectMsg(){
+int detectMsg(){
     printf("Begin detection");
 
     std::map<canid_t, infoID> all_IDs;
@@ -31,7 +31,7 @@ void detectMsg(){
         ioctl(s, SIOCGIFNAME, &ifr);
 
         if(can_bytes < 0) {
-            prerror("can raw socket read");
+            perror("can raw socket read");
             return 1;
         }
 

@@ -19,7 +19,16 @@ int main() {
 	    default:
 	    break;
     }
-
+    int dtcMsgErr = detectMsg();
+    switch (dtcMsgErr){
+	    case 0:
+	    break;
+	    case 1:
+	    //can read error
+	    break;
+	    default:
+	    break;
+    }
 
     
     return 0;

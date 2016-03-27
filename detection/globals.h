@@ -7,7 +7,7 @@
 
 #define ARRAY_SIZE 0x7FF 
 
-extern unordered_map<int, double> frequencies;
+extern std::unordered_map<int, double> frequencies;
 //extern CAN can;
 //extern time_t timer;
 

@@ -10,10 +10,10 @@ typedef struct {
 	double end;
 }infoID;
 
-int calculateFrequencies(ID id);
+//int calculateFrequencies(ID id);
 
 //Detect rate of incoming rate of detect frequencies 
-void detectMsg();
+int detectMsg();
 
 
 #endif // DETECT_H_
