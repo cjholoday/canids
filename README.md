@@ -22,3 +22,8 @@
 * WIP
 * Learning phase collects CAN packet arrival times and determines acceptable frequency per packet
 * Detection phase analyzes incoming packets and determines if they are valid based on learning results
+
+### A Raspberry Pi setup manual ###
+
+* RaspberryPiSetupManual.pdf is a basic manual for how to use Susan's pi for temporary development before the new SD cards arrives
+* Corrections and updates are welcomed
