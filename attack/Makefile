@@ -1,3 +1,6 @@
+# NOTE: This file will need to be edited to work with the new attacks. 
+#  	Check out branches "makefile_test" & "eric_branch" for template code.
+
 ARCH=arm
 COMPILER=arm-rpi-linux-gnueabihf 
 
