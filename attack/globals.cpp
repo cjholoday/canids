@@ -1,3 +1,7 @@
+/*
+ * File will need to be edited to work with the new Raspberry Pis
+ */
+
 #include "globals.h"
 
 Serial pc(USBTX,USBRX);
