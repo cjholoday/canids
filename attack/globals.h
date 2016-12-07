@@ -1,3 +1,7 @@
+/*
+ * File will need to be edited to work with the new Raspberry Pis.
+ */
+
 #ifndef GLOBALS_H
 #define GLOBALS_H
 
