@@ -1,5 +1,6 @@
 import can
-can.rc['interface'] = 'socketcan'
+# can.rc['interface'] = 'socketcan_native' # for python 3.3+
+can.rc['interface'] = 'socketcan_native'
 can.rc['channel'] = 'vcan0'
 from can.interfaces.interface import Bus
 
