@@ -1,13 +1,14 @@
 # Use Python 3.2+
 # Reads and prints messages on the CAN bus to the terminal
 #   Includes time stamp, message ID, data length code, message content
-# Stores incoming message IDs and data in a list
+# Stores NUMMESSAGES incoming message IDs and data in a list
+# Floods bus with messages of ID 0 afterwards
 
 NUMMESSAGES = 5 # Will read in NUMMESSAGES messages
 
 import can
-import array
 from can.interfaces.interface import Bus
+from can import Message
 can.rc['interface'] = 'socketcan_native'
 # can.rc['interface'] = 'socketcan_ctypes'
 # socketcan_ctypes should be used for older Linux kernels though
@@ -16,8 +17,7 @@ can.rc['interface'] = 'socketcan_native'
 
 bus1 = Bus(channel='vcan0')
 listener1 = can.BufferedReader()
-notifier1 = can.Notifier(bus1,[listener1])
-# Puts messages in a queue (FIFO)
+notifier1 = can.Notifier(bus1,[listener1]) # Puts messages in a queue (FIFO)
 
 messagesDec = []
 messagesBin = []
@@ -40,6 +40,11 @@ for i in range(0,NUMMESSAGES):
 
 print(messagesDec)
 print(messagesBin)
+
+# Floods bus with messages of ID 0
+while(1):
+    testMessage = Message(data=[0x01, 2, 3, 4, 5]) # ID=0 is default
+    bus1.send(testMessage)
 
 """
 while(1):
