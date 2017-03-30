@@ -7,7 +7,6 @@ NUMMESSAGES = 5 # Will read in NUMMESSAGES messages
 
 import can
 import array
-import numpy as np
 from can.interfaces.interface import Bus
 can.rc['interface'] = 'socketcan_native'
 # can.rc['interface'] = 'socketcan_ctypes'
