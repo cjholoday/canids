@@ -1,5 +1,4 @@
 import can
-import struct
 from can.interfaces.interface import Bus
 from can import Message
 from can import Logger
@@ -40,8 +39,8 @@ except KeyboardInterrupt: # Press Ctrl-C to stop collecting data
     pass
 
 # Will write frequency distribution to this file
-filename = 'idFreqDist'
+filename = 'idFreqDist.txt'
 outFile = open(filename, 'w')
 for item in idList:
-  outFile.write("%s\n" % item)
+    outFile.write("%s\n" % item)
 outFile.close()
