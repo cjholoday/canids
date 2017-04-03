@@ -39,8 +39,8 @@ except KeyboardInterrupt: # Press Ctrl-C to stop collecting data
     pass
 
 # Will write frequency distribution to this file
-filename = 'idFreqDist.txt'
+filename = 'idFreqDist.csv'
 outFile = open(filename, 'w')
 for item in idList:
-    outFile.write("%s\n" % item)
+    outFile.write("%s%s%s\n" % (item[0], ',', item[1]))
 outFile.close()
