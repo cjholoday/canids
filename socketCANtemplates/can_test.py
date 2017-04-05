@@ -7,7 +7,6 @@
 NUMMESSAGES = 5 # Will read in NUMMESSAGES messages
 
 import can
-import struct
 from can.interfaces.interface import Bus
 from can import Message
 from can import Logger
@@ -31,14 +30,14 @@ for i in range(0,NUMMESSAGES):
     thisMessage = listener1.get_message(10)
     ascWriter1(thisMessage)
     csvWriter1(thisMessage)
-    # Data section in CSV file is in base 64
+    # Data section in eexit
+    # CSV file is in base 64
     print("This is the message: ", thisMessage)
     print("This is the message ID: ", thisMessage.arbitration_id) # Returns decimal value
     print("This is the data content: ", thisMessage.data)
     # Above is in hex, converts to printable char when possible
     thisMessage.dataDec = int.from_bytes(thisMessage.data, byteorder='big')
     # Above is where Python 3.2+ needed, use struct module in lower versions
-    # thisMessage.dataDec = struct.unpack('B',thisMessage.data) working on converting to float
     print("This is the data content in decimal: ", thisMessage.dataDec)
     thisMessage.dataBin = bin(thisMessage.dataDec)
     thisMessage.arbitration_idBin = bin(thisMessage.arbitration_id)
