@@ -1,0 +1,40 @@
+##################################################
+# Connecting to the car with USB2CAN             #
+##################################################
+
+What you'll need
+    Two DB9 connectors
+        Male that splits into two female
+        Male to female
+    USB2CAN converter
+
+----------------------------------------------
+1. Download and install the driver for USB2CAN
+----------------------------------------------
+
+Go to http://www.8devices.com/products/usb2can. If you're using linux, then clone the repository which is linked. Go into the repository directory and run "make"
+
+This guide assumes you're using the linux version
+
+----------------------------------------------
+2. Enable access to USB2CAN in virtualbox (if you're using virtualbox)
+----------------------------------------------
+
+First install the guest additions for virtualbox by clicking on the "devices" tab and then selecting "Insert Guest Additions CD Image". Restart your virtual machine just to be sure that the guest additions was correctly installed.
+
+Next, plug in USB2CAN and go to the "devices" and then "USB" and finally to "USB Settings" tab again. Click on the plus sign cable and under the "USB Device Filters" partition and select the USB2CAN device. This sets it as accessible to the virtual machine as well as the host computer
+
+
+Pull out and replug-in the USB2CAN device once the USB filter is created
+
+----------------------------------------------
+3. Follow the set instructions at https://github.com/krumboeck/usb2can
+----------------------------------------------
+
+You'll likely need to use "sudo" to execute some of the commands
+
+----------------------------------------------
+4. Capture activity on the CAN bus
+----------------------------------------------
+
+Run "candump can0". You can also create logs using the "-l" option.
