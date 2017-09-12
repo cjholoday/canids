@@ -1,0 +1,17 @@
+Using can-utils
+
+https://github.com/linux-can/can-utils
+
+Install can-utils
+1. sudo apt-get install can-utils
+Set up a virtual CAN device
+1. Enable vcan (Virtual CAN) modules
+a. sudo modprobe vcan
+2. Create a vcan device called vcan0
+a. sudo ip link add name vcan0 type vcan
+3. Check to make sure vcan0 exists
+a. sudo ifconfig vcan0 up
+4. Open another terminal and type candump vcan0. Leave this terminal open and candump running and switch to view the first terminal at
+the same time.
+5. Sends a message to vcan0 which the second terminal should display if candump is running
+a. cansend vcan0 123#1122334455667788

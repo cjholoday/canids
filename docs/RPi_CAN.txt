@@ -1,0 +1,6 @@
+http://copperhilltech.com/pican-2-can-interface-for-raspberry-pi/
+
+hostname: MDP
+password: raspberry
+
+https://stackoverflow.com/questions/16040128/hook-up-raspberry-pi-via-ethernet-to-laptop-without-router

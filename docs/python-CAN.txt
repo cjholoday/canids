@@ -1,0 +1,30 @@
+Guide for python-can (Linux)
+ * python-can website - https://python-can.readthedocs.io/en/latest/
+ * python-can Release 2.0.0-alpha.2 PDF
+
+Installation
+ * pip install python-can (for Python 2.x.x)
+ * pip3 install python-can (for Python 3+)
+ * Note: May need to install pip or pip3 first, terminal will prompt you
+
+Testing
+ * ### Copy the following and save as a .py file
+   
+   import can
+   can.rc['interface'] = 'socketcan_native'
+   can.rc['channel'] = 'vcan0'
+   from can.interfaces.interface import Bus
+   bus = Bus()
+   while(1):
+   	print(bus.recv())
+   ### End copy
+ 
+ * Note: the above only works for versions of python3, if you try it with python2, you get a weird error message with can-utils installed, start a vcan instance "vcan0" (follow steps on the "Using can-utils" page) in a terminal, then run "cangen vcan0".
+ * Open another terminal and run "candump vcan0"
+ * Open another terminal and run the above Python program. Messages here should be the same as ones displayed by candump.
+
+Notes
+ * To run Python programs:
+ * python <program name> to run with Python 2.x.x
+ * python3 <program name> to run with Python 3+
+ * .data for messages converts hex to equivalent ASCII character when possible. For example c4 2b 18 47 fa f7 88 70 = \xc4 + \x18 G \xfa \xf7 \x88 p

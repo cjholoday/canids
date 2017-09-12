@@ -1,0 +1,18 @@
+----------------------------------------------
+CAN Bus Connection
+----------------------------------------------
+* Connection located behind center arm rest of back row seating
+* If the panel door is locked, lower seats to access connection ports
+* The CAN bus is accessed with a DB9 conection to Hispeed Bus or Lowspeed Bus
+ * Currently unable to access Lowspeed Bus
+ * Hispeed Bus runs at 500 kbit/s
+ * Pinout: 7 = CAN Hi, 2 = CAN Lo, 3 = GND, 5 = Shield
+
+----------------------------------------------
+Battery Issues
+----------------------------------------------
+* There is a switch located near the batter, it must be down in order for vehicle to start
+* Battery drains very quickly, so a jump may be required to start the engine
+* A portable jump starter is located in the office
+* Follow standard proceedures to start the vehicle - http://jumpstarterexpert.com/how-to-use-a-portable-jump-starter/
+* Flip switch near battery up after use to preserve charge for next use

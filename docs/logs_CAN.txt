@@ -1,0 +1,7 @@
+Recording the log files:
+
+candump -l
+Replay log files on a virtual CAN netowork:
+canplayer -I candump-idle.log vcan0=can0
+
+
