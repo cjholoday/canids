@@ -4,10 +4,6 @@
 
 * The attack, detection, response, and hardware used for a CAN security project
 
-### Contribution Guidelines ###
-
-* 
-
 ### Attack directory ###
 
 * 
