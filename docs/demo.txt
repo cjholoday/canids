@@ -1,0 +1,37 @@
+------------
+RPi Ethernet
+------------
+ifconfig #check for ip addresses of local devices
+nmap -n -sP 10.42.0.255/24
+ssh pi@(ipv4 address of RPi)
+#password: raspberry
+
+-------------------
+connect CAN devices
+-------------------
+#plug in one device at a time#
+#bring device up#
+sudo ip link set <device name> up type can bitrate <bitrate>
+#take down#
+sudo ip link set <device name> down
+
+-------------------
+demonstration
+-------------------
+ RPi(vehicle)  Abl1(vehcile)
+  ||              ||
+==================================
+        ||                  ||
+      Abl2(response)    USB2CAN(attack)
+
+RPi: cangen <device name>
+Abl1: candump <device name>, cangen <device name>
+...
+USB2CAN: cangen <device name> -g 0.1 -I 111 -L 2 -D AAAA
+...
+Abl2: cangen <device name> -g 0.1 -I 111 -L 2 -D 0000
+
+-------------------
+Note: interframespace at 500000 kbit/s with 0.1 ms gap is 50 bits
+--idea: slow down baud rate to achieve minimum interframe space
+
