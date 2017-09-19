@@ -48,4 +48,4 @@ if __name__ == '__main__':
         temp.print_Message()
         send_message(temp)
 
-    print('Fin')
+    print('Finish')
