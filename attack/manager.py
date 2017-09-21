@@ -8,10 +8,13 @@ can.rc['channel'] = 'vcan0'
 bus = can.interface.Bus()
 
 def print_msg(can_msg):
-    # TODO: fix display of data portion
     # TODO: move this to a module where other teams can use it
+    data_str = ''
+    for byte in can_msg.data:
+        data_str += '{:02x} '.format(byte)
+
     print('{}  {:03x}   [{}]  {}'.format( can.rc['channel'], 
-        can_msg.arbitration_id, len(can_msg.data), 'todo'))
+        can_msg.arbitration_id, len(can_msg.data), data_str))
 
 class AttackManager:
     def __init__(self):
