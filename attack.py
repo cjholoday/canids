@@ -7,4 +7,6 @@
 from attack import attacks
 
 if __name__ == '__main__':
-    attacks.hello_world()
+    attacks.dos()
+    attacks.fuzz()
+    attacks.fuzz_replay()
