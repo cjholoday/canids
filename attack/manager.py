@@ -28,6 +28,8 @@ class AttackManager:
         self.delay_prob = None
 
         self.payload_delay = None
+        
+        self.show_sent_payloads = False
 
     def reset(self):
         """Sets this manager up as if it hasn't been used in an attack"""
@@ -37,7 +39,7 @@ class AttackManager:
     def should_continue(self):
         """Returns true if the attack should continue"""
 
-        if self.max_payloads and self.max_payloads >= self.payloads_sent:
+        if self.max_payloads and self.payloads_sent >= self.max_payloads:
             return False
         elif self.max_time and self.start_time:
             return timeit.default_timer() - self.start_time <= self.max_time
@@ -53,22 +55,12 @@ class AttackManager:
         self.payloads_sent += 1
         return True
         
-
-    def delay_payload(self):
-        """Delays the payload from being sent if a delay was configured"""
-
-        # TODO: implement delay probability
-        if self.payload_delay:
-            time.sleep(self.payload_delay)
-
-    def display_payload(self, can_msg):
-        """Display the payload if the user configured display of messages"""
-        # TODO: add option to display / not display
-        print_msg(can_msg)
-
     def attack(self, payload):
         """Manages an attack using configuration from a CLI"""
         if self.should_attack():
-            self.delay_payload()
-            self.display_payload(payload)
+            # TODO: implement delay probability
+            if self.payload_delay:
+                time.sleep(self.payload_delay)
+            if self.show_sent_payloads:
+                print_msg(payload)
             bus.send(payload)

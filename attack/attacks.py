@@ -56,3 +56,9 @@ def replay(manager):
         # TODO: bug: this probably adds the message we just sent
         msg = attack.manager.bus.recv(timeout=1)
         if msg: replay_ref.append(msg)
+
+attack_dict = {
+        'dos' : dos,
+        'fuzz' : fuzz,
+        'replay' : replay,
+}
