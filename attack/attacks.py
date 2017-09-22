@@ -28,7 +28,7 @@ def fuzz(manager):
     random.seed()
     while manager.should_continue():
         data_list = []
-        for i in range(8):
+        for _ in range(8):
             data_list.append(random.randint(0, DATA_MAX))
         msg = can.Message(arbitration_id=random.randint(0, ARBITRATION_MAX),
             data=data_list, extended_id=False)
@@ -52,10 +52,10 @@ def replay(manager):
         # replay a random mesasge from the ones we've stored
         manager.attack(random.choice(replay_ref))
 
-        # capture a message to add to our reference
-        # TODO: bug: this probably adds the message we just sent
+        # capture a message to add to our reference. It won't be the msg we sent
         msg = attack.manager.bus.recv(timeout=1)
         if msg: replay_ref.append(msg)
+        
 
 attack_dict = {
         'dos' : dos,

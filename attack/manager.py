@@ -1,5 +1,7 @@
 import timeit
 import time
+import fractions
+import random
 
 import can
 
@@ -8,13 +10,16 @@ can.rc['channel'] = 'vcan0'
 bus = can.interface.Bus()
 
 def print_msg(can_msg):
-    # TODO: move this to a module where other teams can use it
     data_str = ''
     for byte in can_msg.data:
         data_str += '{:02x} '.format(byte)
 
     print('{}  {:03x}   [{}]  {}'.format( can.rc['channel'], 
         can_msg.arbitration_id, len(can_msg.data), data_str))
+
+def fraction_roll(success_rate):
+    """Returns true with a given success rate"""
+    return random.randint(1, success_rate.denominator) <= success_rate.numerator
 
 class AttackManager:
     def __init__(self):
@@ -49,21 +54,23 @@ class AttackManager:
         else:
             return True
 
-    def should_attack(self):
-        """Returns true if a payload should be sent"""
-        if self.max_time and self.start_time == None:
-            self.start_time = timeit.default_timer()
-
-        # TODO: implement attack probability
-        self.payloads_sent += 1
-        return True
-        
     def attack(self, payload):
         """Manages an attack using configuration from a CLI"""
-        if self.should_attack():
-            # TODO: implement delay probability
-            if self.payload_delay:
+        if not self.attack_prob or fraction_roll(self.attack_prob):
+            if self.payload_delay and (
+                    not self.delay_prob or fraction_roll(self.delay_prob)):
+                print("(payload delay)")
                 time.sleep(self.payload_delay)
+
+            # start the timer once the first payload is sent
+            if self.max_time and self.start_time == None:
+                print("(start timer)")
+                self.start_time = timeit.default_timer()
+
+            bus.send(payload)
+            self.payloads_sent += 1
             if self.show_sent_payloads:
                 print_msg(payload)
-            bus.send(payload)
+
+        else:
+            print("(skip payload)")
