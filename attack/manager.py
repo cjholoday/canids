@@ -37,7 +37,7 @@ class AttackManager:
 
         self.payload_delay = None
         
-        self.show_sent_payloads = False
+        self.quiet = False
 
     def reset(self):
         """Sets this manager up as if it hasn't been used in an attack"""
@@ -59,18 +59,17 @@ class AttackManager:
         if not self.attack_prob or fraction_roll(self.attack_prob):
             if self.payload_delay and (
                     not self.delay_prob or fraction_roll(self.delay_prob)):
-                print("(payload delay)")
+                if not self.quiet: print("(payload delay)")
                 time.sleep(self.payload_delay)
 
             # start the timer once the first payload is sent
             if self.max_time and self.start_time == None:
-                print("(start timer)")
+                if not self.quiet: print("(start timer)")
                 self.start_time = timeit.default_timer()
 
             bus.send(payload)
             self.payloads_sent += 1
-            if self.show_sent_payloads:
-                print_msg(payload)
+            if not self.quiet: print_msg(payload)
 
         else:
             print("(skip payload)")

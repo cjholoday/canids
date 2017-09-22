@@ -24,8 +24,6 @@ def dos(manager):
 
 def fuzz(manager):
     """Send uniformly random messages to the bus"""
-
-    random.seed()
     while manager.should_continue():
         data_list = []
         for _ in range(8):
