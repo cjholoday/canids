@@ -6,10 +6,11 @@
 
 from attack import attacks
 import attack.manager
-import click
 import sys
 import fractions
 import random
+
+import click
 
 @click.command()
 @click.option('--max-time', type=float, 

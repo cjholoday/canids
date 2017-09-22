@@ -1,8 +1,6 @@
 # attacks.py
 #
 # purpose: implements all attack types
-# note: options to control the length of the attack, when they occur, etc.
-#       will be added in the future
 
 from data import utils
 import can
@@ -54,7 +52,7 @@ def replay(manager):
         msg = attack.manager.bus.recv(timeout=1)
         if msg: replay_ref.append(msg)
         
-
+# all attacks must be registered in this dict of function pointers
 attack_dict = {
         'dos' : dos,
         'fuzz' : fuzz,

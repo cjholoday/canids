@@ -1,3 +1,7 @@
+# manager.py
+#
+# purpose: handle management of command line configuration of attacks
+
 import timeit
 import time
 import fractions
