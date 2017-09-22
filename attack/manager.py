@@ -72,4 +72,4 @@ class AttackManager:
             if not self.quiet: print_msg(payload)
 
         else:
-            print("(skip payload)")
+            if not self.quiet: print("(skip payload)")
