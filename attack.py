@@ -30,6 +30,24 @@ import click
 @click.argument('attack_type', type=click.Choice(list(attacks.attack_dict.keys())))
 def run_attack(max_time, max_payloads, attack_prob, delay_prob, 
         payload_delay, quiet, attack_type, seed):
+    """CAN Attack Suite. Currently supported attack types:
+
+        'dos'
+
+        \tDenial of service. Sends messages with all data as 0
+
+        'fuzz'
+
+        \tSends randomly generated messages with uniform probability
+
+        'replay'
+
+        \tCollects messages played on the bus and replays them with
+        \tuniform probability. Eight messages are collected before the
+        \tattack begins. After each payload is sent, another message
+        \tis added to the replay buffer
+    """
+
     manager = attack.manager.AttackManager()
 
     # Configure the attack manager with command options
