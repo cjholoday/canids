@@ -2,7 +2,7 @@
 #
 # purpose: implements all attack types
 
-from data import utils
+from data import log_utils
 import can
 import random
 import sys

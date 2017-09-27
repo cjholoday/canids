@@ -1,0 +1,37 @@
+#spoof.log is from fourth to last video taken
+#floor_fifty is third last video
+#above_max_170 is second from last
+
+#final video is full range spoof 
+
+#the higher the value, the more the random spikes occur
+spoof (mph)| idle vehicle 
+-------------------
+    0      |  0
+    5      |  3.5
+    10     |  8
+    15     |  11
+    20     |  15
+    25     |  20
+    30     |  24
+    40     |  32
+    50     |  40
+    60     |  49
+    70     |  56
+    80     |  64
+    90     |  71
+    100    |  80
+    110    |  88
+    120    |  96
+    130    |  104
+    140    |  111
+    150    |  119
+    160(max)|  129
+    170    |  136
+    180    |  145
+    190    |  151
+    200    |  160
+    
+    
+    255    |  160
+    256    |  0
