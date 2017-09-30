@@ -1,6 +1,6 @@
-import context #  Necessary so python3 finds modules
-from defense.detection.mlids import fileio
 import os
+import context
+from defense import fileio
 
 data_file = os.getcwd() + '/../data/logs/recording1.log'
 
