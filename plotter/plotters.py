@@ -1,0 +1,60 @@
+import matplotlib.pyplot as plt
+import numpy as np
+
+tick_size = 4
+title_size = 10
+label_size = 6
+
+
+def plot_bit_occurrences(plot_title, can_data):
+    ones_count = np.zeros(64)
+    for msg in can_data:
+        if len(msg.data) != 64:
+            raise ValueError('Unexpected CAN message data length: ' + str(len(msg.data)))
+        for i in range(0, 64):
+            if msg.data[i] == '1':
+                ones_count[i] = ones_count[i] + 1
+
+    fig, ax = plt.subplots()
+
+    bit_pos_nums = np.linspace(0, 63, num=64, dtype=int)
+    y_pos = np.arange(len(bit_pos_nums))
+
+    plt.bar(y_pos, ones_count)
+    plt.xticks(y_pos, bit_pos_nums, fontsize=tick_size, rotation='vertical')
+    plt.title(plot_title, fontsize=title_size)
+    plt.xlabel('ith Bit Position', fontsize=label_size)
+    plt.ylabel('Number of ones', fontsize=label_size)
+
+    plt.close()
+
+    i_string = 'Bit Position'
+    count_string = 'Number of ones'
+    for i in range(0, 64):
+        i_string = i_string + ',' + str(i)
+        count_string = count_string + ',' + str(ones_count[i])
+
+    return [fig, i_string + '\n' + count_string]
+
+
+def plot_id_occurrences(plot_title, freq_data):
+    ids = np.array([])
+    freqs = np.array([])
+    for id in freq_data:
+        ids = np.append(ids, [id])
+        freqs = np.append(freqs, [freq_data[id]])
+
+    fig, ax = plt.subplots()
+
+    y_pos = np.arange(len(ids))
+
+    plt.bar(y_pos, freqs)
+    plt.xticks(y_pos, ids, fontsize=tick_size)
+    plt.title(plot_title, fontsize=title_size)
+    plt.xlabel('CAN Message ID', fontsize=label_size)
+    plt.ylabel('Number of occurrences', fontsize=label_size)
+
+    fig.autofmt_xdate()
+
+    plt.close()
+    return fig

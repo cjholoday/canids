@@ -19,8 +19,7 @@ def log_parser(log_file_name):
     can_msg_objs = []
     for line in msgs:
         ts_field = float(line[0][1:-1])  # Delete beginning and ending parentheses
-        id_field = '0x' + line[1][0]
-        id_field = format(int(id_field, 16), '011b')  # 11 bit message id
+        id_field = line[1][0]
         data_field = '0x' + line[1][1][:-1]  # Delete newline at end
         data_field = format(int(data_field, 16), '064b')  # 8 bytes of data
         can_msg_objs.append(CANMessage(ts_field, id_field, data_field))

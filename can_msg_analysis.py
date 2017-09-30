@@ -1,50 +1,73 @@
 import os
-
-import matplotlib.pyplot as plt
-import numpy as np
 from matplotlib.backends.backend_pdf import PdfPages
+import plotter.plotters as plotter
+import csv
 
 from defense import fileio
 
-tick_size = 4
+wd = os.getcwd()
+files = [wd + '/data/logs/recording1.log', wd + '/data/logs/recording2.log']
 
 
-def plot_bit_data(plot_title, can_data):
-    ones_count = np.zeros(64)
-    for msg in can_data:
-        if len(msg.data) != 64:
-            raise ValueError('Unexpected CAN message data length: ' + str(len(msg.data)))
-        for i in range(0, 64):
-            if msg.data[i] == '1':
-                ones_count[i] = ones_count[i] + 1
+def bit_frequency_analyzer(file_data_map):
+    figures = []
+    all_msg_data = []
 
-    fig, ax = plt.subplots()
+    with open('data/analysis_dump/bit_occurrences.csv', 'w') as out_file:
+        for file in file_data_map:
+            [temp_fig, out_string] = plotter.plot_bit_occurrences('Number of 1\'s in bit position '
+                                                                  'i,'
+                                                                  '\n' + file, file_data_map[file])
+            all_msg_data = all_msg_data + file_data_map[file]
+            figures.append(temp_fig)
+            out_file.write(out_string + '\n')
 
-    bit_pos_nums = np.linspace(0, 63, num=64, dtype=int)
-    y_pos = np.arange(len(bit_pos_nums))
+        [temp_fig, out_string] = plotter.plot_bit_occurrences('Number of 1\'s in bit position i,'
+                                                              '\n' + 'All', all_msg_data)
+        figures.append(temp_fig)
+        out_file.write(out_string)
 
-    plt.bar(y_pos, ones_count)
-    plt.xticks(y_pos, bit_pos_nums, fontsize=tick_size, rotation='vertical')
-    plt.title(plot_title)
-    plt.xlabel('ith Bit Position')
-    plt.ylabel('Number of ones')
-
-    plt.close()
-    return fig
-
-data_file1 = os.getcwd() + '/data/logs/recording1.log'
-data_file2 = os.getcwd() + '/data/logs/recording2.log'
-
-figures = []
-
-can_msgs = fileio.log_parser(data_file1)
-figures.append(plot_bit_data('Number of 1\'s in bit position i,\nRecording 1', can_msgs))
-
-can_msgs = fileio.log_parser(data_file2)
-figures.append(plot_bit_data('Number of 1\'s in bit position i,\nRecording 2', can_msgs))
+    pp = PdfPages('plots/bit_occurrences.pdf')
+    for fig in figures:
+        pp.savefig(fig)
+    pp.close()
 
 
-pp = PdfPages('plots/bit_frequency.pdf')
-for fig in figures:
-    pp.savefig(fig)
-pp.close()
+def id_frequency_analyzer(file_data_map):
+    id_occurrence_figures = []
+    all_id_freq_map = {}
+    for file in file_data_map:
+        id_freq_map = {}
+        for can_msg in file_data_map[file]:
+            if can_msg.id not in id_freq_map:
+                id_freq_map[can_msg.id] = 1
+            else:
+                id_freq_map[can_msg.id] = id_freq_map[can_msg.id] + 1
+            if can_msg.id not in all_id_freq_map:
+                all_id_freq_map[can_msg.id] = 1
+            else:
+                all_id_freq_map[can_msg.id] = all_id_freq_map[can_msg.id] + 1
+
+        id_occurrence_figures.append(plotter.plot_id_occurrences('CAN ID Occurrences,'
+                                                                 '\n' + file, id_freq_map))
+    id_occurrence_figures.append(plotter.plot_id_occurrences('CAN ID Occurrences,'
+                                                             '\nAll', all_id_freq_map))
+
+    with open('data/analysis_dump/id_occurrences.csv', 'w') as csv_file:
+        writer = csv.writer(csv_file)
+        for key, value in all_id_freq_map.items():
+            writer.writerow([key, value])
+
+    pp = PdfPages('plots/id_occurrences.pdf')
+    for fig in id_occurrence_figures:
+        pp.savefig(fig)
+    pp.close()
+
+
+if __name__ == "__main__":
+    can_msgs = {}
+    for file in files:
+        can_msgs[file[file.find('recording'):]] = fileio.log_parser(file)
+
+    bit_frequency_analyzer(can_msgs)
+    id_frequency_analyzer(can_msgs)
