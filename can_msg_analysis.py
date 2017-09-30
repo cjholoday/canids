@@ -9,7 +9,7 @@ wd = os.getcwd()
 files = [wd + '/data/logs/recording1.log', wd + '/data/logs/recording2.log']
 
 
-def bit_frequency_analyzer(file_data_map):
+def bit_occurrence_analyzer(file_data_map):
     figures = []
     all_msg_data = []
 
@@ -33,7 +33,7 @@ def bit_frequency_analyzer(file_data_map):
     pp.close()
 
 
-def id_frequency_analyzer(file_data_map):
+def id_occurrence_analyzer(file_data_map):
     id_occurrence_figures = []
     all_id_freq_map = {}
     for file in file_data_map:
@@ -64,10 +64,22 @@ def id_frequency_analyzer(file_data_map):
     pp.close()
 
 
+def id_frequency_analyzer(file_data_map):
+    return
+
+
+def msg_data_entropy_analyzer(file_data_map):
+    return
+
+
+def id_based_entropy_analyzer(file_data_map):
+    return
+
+
 if __name__ == "__main__":
     can_msgs = {}
     for file in files:
         can_msgs[file[file.find('recording'):]] = fileio.log_parser(file)
 
-    bit_frequency_analyzer(can_msgs)
-    id_frequency_analyzer(can_msgs)
+    bit_occurrence_analyzer(can_msgs)
+    id_occurrence_analyzer(can_msgs)
