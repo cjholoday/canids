@@ -4,3 +4,7 @@ class CANMessage:
         self.timestamp = ts
         self.id = msg_id
         self.data = msg_data
+
+    def __repr__(self):
+        return '0x' + str(hex(int(self.id, 2)))[2:].zfill(3) + ': 0x' \
+               + str(hex(int(self.data, 2)))[2:].zfill(16)

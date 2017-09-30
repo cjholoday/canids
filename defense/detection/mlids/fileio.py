@@ -1,4 +1,4 @@
-from .canclass import CANMessage
+from defense.detection.mlids.canclass import CANMessage
 
 
 # Returns .log file contents as [timestamp, [message id, message data]]
