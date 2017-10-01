@@ -4,6 +4,7 @@
 # note: attack.py must be placed in the top level directory so that the attack
 #       submodule has access to other submodules' functions
 
+
 from attack import attacks
 import attack.manager
 import sys
@@ -11,6 +12,11 @@ import fractions
 import random
 
 import click
+import can
+
+
+can.rc['interface'] = 'socketcan_ctypes'
+
 
 @click.command()
 @click.option('--max-time', type=float, 
@@ -27,9 +33,12 @@ import click
         help='Use seed INTEGER with the random number generator')
 @click.option('-q', '--quiet', is_flag=True, 
         help='Suppress all output')
+@click.option('-c', '--channel', type=str,
+        help='Specify what channel to which to send payloads (e.g. vcan0, can0)'
+        ' (default=vcan0)')
 @click.argument('attack_type', type=click.Choice(list(attacks.attack_dict.keys())))
 def run_attack(max_time, max_payloads, attack_prob, delay_prob, 
-        payload_delay, quiet, attack_type, seed):
+        payload_delay, quiet, attack_type, seed, channel):
     """CAN Attack Suite. Currently supported attack types:
 
         'dos'
@@ -47,6 +56,12 @@ def run_attack(max_time, max_payloads, attack_prob, delay_prob,
         \tattack begins. After each payload is sent, another message
         \tis added to the replay buffer
     """
+    can.rc['channel'] = 'vcan0'
+    if channel:
+        can.rc['channel'] = channel
+    attack.manager.bus = can.interface.Bus()
+
+
 
     manager = attack.manager.AttackManager()
 

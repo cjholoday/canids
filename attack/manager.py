@@ -7,11 +7,9 @@ import time
 import fractions
 import random
 
+
 import can
 
-can.rc['interface'] = 'socketcan_ctypes'
-can.rc['channel'] = 'vcan0'
-bus = can.interface.Bus()
 
 def print_msg(can_msg):
     data_str = ''
@@ -21,9 +19,11 @@ def print_msg(can_msg):
     print('{}  {:03x}   [{}]  {}'.format( can.rc['channel'], 
         can_msg.arbitration_id, len(can_msg.data), data_str))
 
+
 def fraction_roll(success_rate):
     """Returns true with a given success rate"""
     return random.randint(1, success_rate.denominator) <= success_rate.numerator
+
 
 class AttackManager:
     def __init__(self):
@@ -74,6 +74,5 @@ class AttackManager:
             bus.send(payload)
             self.payloads_sent += 1
             if not self.quiet: print_msg(payload)
-
         else:
             if not self.quiet: print("(skip payload)")
