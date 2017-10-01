@@ -43,25 +43,23 @@ def run_attack(max_time, max_payloads, attack_prob, delay_prob,
 
         'dos'
 
-        \tDenial of service. Sends messages with all data as 0
+        Denial of service. Sends messages with all data as 0
 
         'fuzz'
 
-        \tSends randomly generated messages with uniform probability
+        Sends randomly generated messages with uniform probability
 
         'replay'
 
-        \tCollects messages played on the bus and replays them with
-        \tuniform probability. Eight messages are collected before the
-        \tattack begins. After each payload is sent, another message
-        \tis added to the replay buffer
+        Collects messages played on the bus and replays them with
+        uniform probability. Eight messages are collected before the
+        attack begins. After each payload is sent, another message
+        is added to the replay buffer
     """
     can.rc['channel'] = 'vcan0'
     if channel:
         can.rc['channel'] = channel
     attack.manager.bus = can.interface.Bus()
-
-
 
     manager = attack.manager.AttackManager()
 
