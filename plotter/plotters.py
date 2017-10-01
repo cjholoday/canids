@@ -37,12 +37,12 @@ def plot_bit_occurrences(plot_title, can_data):
     return [fig, i_string + '\n' + count_string]
 
 
-def plot_id_occurrences(plot_title, freq_data):
+def plot_id_occurrences(plot_title, occurrence_data):
     ids = np.array([])
     freqs = np.array([])
-    for id in freq_data:
+    for id in occurrence_data:
         ids = np.append(ids, [id])
-        freqs = np.append(freqs, [freq_data[id]])
+        freqs = np.append(freqs, [occurrence_data[id]])
 
     fig, ax = plt.subplots()
 
@@ -58,3 +58,28 @@ def plot_id_occurrences(plot_title, freq_data):
 
     plt.close()
     return fig
+
+
+def plot_id_frequency_distribution(plot_title, freq_data):
+    freqs = np.array([])
+    occurrences = np.array([])
+    freq_times_occurrences = 0
+    for freq in sorted(freq_data):
+        freqs = np.append(freqs, [freq])
+        occurrences = np.append(occurrences, [freq_data[freq]])
+        freq_times_occurrences = freq_times_occurrences + freq*freq_data[freq]
+
+    fig, ax = plt.subplots()
+    y_pos = np.arange(len(freqs))
+
+    plt.bar(y_pos, occurrences)
+    plt.xticks(y_pos, freqs, fontsize=tick_size)
+    plt.title(plot_title, fontsize=title_size)
+    plt.xlabel('Frequency', fontsize=label_size)
+    plt.ylabel('Number of Occurrences of Frequency', fontsize=label_size)
+
+    fig.autofmt_xdate()
+
+    plt.close()
+
+    return [fig, freq_times_occurrences / np.sum(occurrences)]

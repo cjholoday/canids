@@ -2,6 +2,7 @@ import os
 from matplotlib.backends.backend_pdf import PdfPages
 import plotter.plotters as plotter
 import csv
+import json
 
 from defense import fileio
 
@@ -53,10 +54,8 @@ def id_occurrence_analyzer(file_data_map):
     id_occurrence_figures.append(plotter.plot_id_occurrences('CAN ID Occurrences,'
                                                              '\nAll', all_id_freq_map))
 
-    with open('data/analysis_dump/id_occurrences.csv', 'w') as csv_file:
-        writer = csv.writer(csv_file)
-        for key, value in all_id_freq_map.items():
-            writer.writerow([key, value])
+    with open('data/analysis_dump/id_occurrences.json', 'w') as json_file:
+        json_file.write(json.dumps(all_id_freq_map, sort_keys=True, indent=4))
 
     pp = PdfPages('plots/id_occurrences.pdf')
     for fig in id_occurrence_figures:
@@ -65,15 +64,54 @@ def id_occurrence_analyzer(file_data_map):
 
 
 def id_frequency_analyzer(file_data_map):
-    return
+    all_data = {}
+    for file in file_data_map:
+        i = 0
+        while i < len(file_data_map[file]) - 1:
+            one_second_data = {}
+            t_i = file_data_map[file][i].timestamp
+            one_second_data[file_data_map[file][i].id] = 1
+            i = i + 1
+            if i >= len(file_data_map[file]):
+                break
+            t_t = file_data_map[file][i].timestamp
+            while t_t <= t_i + 1:
+                if file_data_map[file][i].id not in one_second_data:
+                    one_second_data[file_data_map[file][i].id] = 1
+                else:
+                    one_second_data[file_data_map[file][i].id] \
+                        = one_second_data[file_data_map[file][i].id] + 1
+                i = i + 1
+                if i >= len(file_data_map[file]):
+                    break
+                t_t = file_data_map[file][i].timestamp
 
+            for msg_id in one_second_data:
+                if msg_id not in all_data:
+                    all_data[msg_id] = {}
+                    all_data[msg_id][one_second_data[msg_id]] = 1
+                else:
+                    if one_second_data[msg_id] not in all_data[msg_id]:
+                        all_data[msg_id][one_second_data[msg_id]] = 1
+                    else:
+                        all_data[msg_id][one_second_data[msg_id]] \
+                            = all_data[msg_id][one_second_data[msg_id]] + 1
 
-def msg_data_entropy_analyzer(file_data_map):
-    return
+    figures = []
+    for identifier in all_data:
+        [fig, avg_freq] = plotter.plot_id_frequency_distribution('Frequency Distribution of ID 0x'
+                                                                 + identifier,
+                                                                 all_data[identifier])
+        figures.append(fig)
+        all_data[identifier]['Average Frequency'] = avg_freq
 
+    pp = PdfPages('plots/id_frequency_distribution.pdf')
+    for fig in figures:
+        pp.savefig(fig)
+    pp.close()
 
-def id_based_entropy_analyzer(file_data_map):
-    return
+    with open('data/analysis_dump/id_frequency_distribution.json', 'w') as json_file:
+        json_file.write(json.dumps(all_data, indent=4))
 
 
 if __name__ == "__main__":
@@ -83,3 +121,4 @@ if __name__ == "__main__":
 
     bit_occurrence_analyzer(can_msgs)
     id_occurrence_analyzer(can_msgs)
+    id_frequency_analyzer(can_msgs)
