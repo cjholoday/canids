@@ -19,11 +19,11 @@ can.rc['interface'] = 'socketcan_ctypes'
 
 
 @click.command()
-@click.option('--max-time', type=float, 
+@click.option('-t', '--max-time', type=float, 
         help='End the attack after FLOAT seconds (default=unbounded)')
-@click.option('--max-payloads', type=int, 
+@click.option('-n', '--max-payloads', type=int, 
         help='End the attack after INTEGER payloads (default=unbounded)')
-@click.option('--payload-delay', type=float, 
+@click.option('-d', '--payload-delay', type=float, 
         help='Delay each payload by FLOAT seconds. Combines with --delay-prob (default=0.0)')
 @click.option('--attack-prob', type=float, 
         help='Send every generated payload with probability FLOAT (default=1.0)')
