@@ -1,13 +1,22 @@
 import os
 from matplotlib.backends.backend_pdf import PdfPages
 import plotter.plotters as plotter
-import csv
 import json
+import math
 
 from defense import fileio
 
 wd = os.getcwd()
 files = [wd + '/data/logs/recording1.log', wd + '/data/logs/recording2.log']
+
+
+def calculate_entropy(map_of_ids):
+    system_entropy = 0
+    for id in map_of_ids:
+        system_entropy = system_entropy + map_of_ids[id]['Probability'] \
+                                          * math.log(1.0 / map_of_ids[id]['Probability'])
+
+    return system_entropy
 
 
 def bit_occurrence_analyzer(file_data_map):
@@ -119,11 +128,34 @@ def id_frequency_analyzer(file_data_map):
     pp.close()
 
 
+def entropy_analyzer(file_data_map):
+    all_id_freq_map = {}
+    timestamps = []
+    entropies = []
+    total_msgs = 0
+
+    for can_msg in file_data_map['recording2.log']:
+        total_msgs = total_msgs + 1
+        if can_msg.id not in all_id_freq_map:
+            all_id_freq_map[can_msg.id] = {}
+            all_id_freq_map[can_msg.id]['Occurrences'] = 0
+        all_id_freq_map[can_msg.id]['Occurrences'] = all_id_freq_map[can_msg.id]['Occurrences'] + 1
+        all_id_freq_map[can_msg.id]['Probability'] = all_id_freq_map[can_msg.id]['Occurrences']\
+                                                     / total_msgs
+        timestamps.append(can_msg.timestamp)
+        entropies.append(calculate_entropy(all_id_freq_map))
+
+    pp = PdfPages('plots/Entropy_vs_time.pdf')
+    pp.savefig(plotter.plot_entropies('Entropy of CAN Bus vs Time', timestamps, entropies))
+    pp.close()
+
+
 if __name__ == "__main__":
     can_msgs = {}
     for file in files:
         can_msgs[file[file.find('recording'):]] = fileio.log_parser(file)
 
-    bit_occurrence_analyzer(can_msgs)
-    id_occurrence_analyzer(can_msgs)
-    id_frequency_analyzer(can_msgs)
+    # bit_occurrence_analyzer(can_msgs)
+    # id_occurrence_analyzer(can_msgs)
+    # id_frequency_analyzer(can_msgs)
+    entropy_analyzer(can_msgs)

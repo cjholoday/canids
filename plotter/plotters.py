@@ -107,3 +107,18 @@ def plot_id_avg_frequency(plot_title, freq_data):
     plt.close()
 
     return fig
+
+
+def plot_entropies(plot_title, timestamps, entropies):
+    fig, ax = plt.subplots()
+
+    plt.plot(timestamps, entropies)
+    plt.title(plot_title, fontsize=title_size)
+    plt.xlabel('Timestamp', fontsize=label_size)
+    plt.ylabel('Entropy', fontsize=label_size)
+
+    fig.autofmt_xdate()
+
+    plt.close()
+
+    return fig
