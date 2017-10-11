@@ -134,16 +134,22 @@ def entropy_analyzer(file_data_map):
     entropies = []
     total_msgs = 0
 
-    for can_msg in file_data_map['recording2.log']:
-        total_msgs = total_msgs + 1
-        if can_msg.id not in all_id_freq_map:
-            all_id_freq_map[can_msg.id] = {}
-            all_id_freq_map[can_msg.id]['Occurrences'] = 0
-        all_id_freq_map[can_msg.id]['Occurrences'] = all_id_freq_map[can_msg.id]['Occurrences'] + 1
-        all_id_freq_map[can_msg.id]['Probability'] = all_id_freq_map[can_msg.id]['Occurrences']\
-                                                     / total_msgs
-        timestamps.append(can_msg.timestamp)
-        entropies.append(calculate_entropy(all_id_freq_map))
+    with open('data/analysis_dump/entropy_vs_time.csv', 'w') as out_file:
+        out_file.write('Timestamp,Entropy\n')
+        for can_msg in file_data_map['recording2.log']:
+            total_msgs = total_msgs + 1
+            if can_msg.id not in all_id_freq_map:
+                all_id_freq_map[can_msg.id] = {}
+                all_id_freq_map[can_msg.id]['Occurrences'] = 0
+            all_id_freq_map[can_msg.id]['Occurrences'] = all_id_freq_map[can_msg.id][
+                                                             'Occurrences'] + 1
+            all_id_freq_map[can_msg.id]['Probability'] \
+                = all_id_freq_map[can_msg.id]['Occurrences'] / total_msgs
+            timestamps.append(can_msg.timestamp)
+            entropy = calculate_entropy(all_id_freq_map)
+            entropies.append(entropy)
+            out_string = str(can_msg.timestamp) + ',' + str(entropy) + '\n'
+            out_file.write(out_string)
 
     pp = PdfPages('plots/Entropy_vs_time.pdf')
     pp.savefig(plotter.plot_entropies('Entropy of CAN Bus vs Time', timestamps, entropies))
