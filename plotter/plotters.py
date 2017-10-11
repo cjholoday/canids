@@ -83,3 +83,27 @@ def plot_id_frequency_distribution(plot_title, freq_data):
     plt.close()
 
     return [fig, freq_times_occurrences / np.sum(occurrences)]
+
+
+def plot_id_avg_frequency(plot_title, freq_data):
+    ids = []
+    freqs = []
+
+    for id in freq_data:
+        ids.append(id)
+        freqs.append(freq_data[id]['Average Frequency'])
+
+    fig, ax = plt.subplots()
+    y_pos = np.arange(len(ids))
+
+    plt.bar(y_pos, freqs)
+    plt.xticks(y_pos, ids, fontsize=tick_size)
+    plt.title(plot_title, fontsize=title_size)
+    plt.xlabel('CAN ID', fontsize=label_size)
+    plt.ylabel('Frequency', fontsize=label_size)
+
+    fig.autofmt_xdate()
+
+    plt.close()
+
+    return fig

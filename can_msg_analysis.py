@@ -113,6 +113,11 @@ def id_frequency_analyzer(file_data_map):
     with open('data/analysis_dump/id_frequency_distribution.json', 'w') as json_file:
         json_file.write(json.dumps(all_data, indent=4))
 
+    pp = PdfPages('plots/id_average_frequency.pdf')
+    fig = plotter.plot_id_avg_frequency('Average Frequency of Each CAN ID', all_data)
+    pp.savefig(fig)
+    pp.close()
+
 
 if __name__ == "__main__":
     can_msgs = {}
