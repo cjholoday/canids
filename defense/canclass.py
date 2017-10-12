@@ -4,6 +4,7 @@ class CANMessage:
         self.timestamp = float(ts)
         self.id = str(msg_id)
         self.data = str(msg_data)
+        self.id_float = int('0x' + self.id, 16)
 
     def __repr__(self):
         return 'ID: 0x' + self.id + ' | DATA: 0x' \
