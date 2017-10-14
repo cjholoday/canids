@@ -46,6 +46,7 @@ def bit_occurrence_analyzer(file_data_map):
 def id_occurrence_analyzer(file_data_map):
     id_occurrence_figures = []
     all_id_freq_map = {}
+    plot_all_id_freq_map = {}
     for file in file_data_map:
         id_freq_map = {}
         for can_msg in file_data_map[file]:
@@ -54,14 +55,26 @@ def id_occurrence_analyzer(file_data_map):
             else:
                 id_freq_map[can_msg.id] = id_freq_map[can_msg.id] + 1
             if can_msg.id not in all_id_freq_map:
-                all_id_freq_map[can_msg.id] = 1
+                all_id_freq_map[can_msg.id] = {}
+                all_id_freq_map[can_msg.id]['Occurrences'] = 1
+                plot_all_id_freq_map[can_msg.id] = 1
             else:
-                all_id_freq_map[can_msg.id] = all_id_freq_map[can_msg.id] + 1
+                all_id_freq_map[can_msg.id]['Occurrences'] \
+                    = all_id_freq_map[can_msg.id]['Occurrences'] + 1
+                plot_all_id_freq_map[can_msg.id] = plot_all_id_freq_map[can_msg.id] + 1
 
         id_occurrence_figures.append(plotter.plot_id_occurrences('CAN ID Occurrences,'
                                                                  '\n' + file, id_freq_map))
     id_occurrence_figures.append(plotter.plot_id_occurrences('CAN ID Occurrences,'
-                                                             '\nAll', all_id_freq_map))
+                                                             '\nAll', plot_all_id_freq_map))
+
+    total_msgs = 0
+    for msg_id in all_id_freq_map:
+        total_msgs = total_msgs + all_id_freq_map[msg_id]['Occurrences']
+
+    for msg_id in all_id_freq_map:
+        all_id_freq_map[msg_id]['Probability'] = all_id_freq_map[msg_id]['Occurrences'] \
+                                                 / float(total_msgs)
 
     with open('data/analysis_dump/id_occurrences.json', 'w') as json_file:
         json_file.write(json.dumps(all_id_freq_map, sort_keys=True, indent=4))
@@ -162,6 +175,6 @@ if __name__ == "__main__":
         can_msgs[file[file.find('recording'):]] = fileio.log_parser(file)
 
     # bit_occurrence_analyzer(can_msgs)
-    # id_occurrence_analyzer(can_msgs)
+    id_occurrence_analyzer(can_msgs)
     # id_frequency_analyzer(can_msgs)
-    entropy_analyzer(can_msgs)
+    # entropy_analyzer(can_msgs)
