@@ -1,7 +1,7 @@
 import tensorflow as tf
 
 
-temp_num_features = 3
+temp_num_features = 4
 
 class SimpleNN:
     """Class for neural network detector"""

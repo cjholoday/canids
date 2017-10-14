@@ -7,6 +7,15 @@ from defense import fileio
 import defense.detection.mlids.simple_nn.simple_nn_impl as classifier
 
 
+def calculate_entropy(map_of_ids):
+    system_entropy = 0
+    for msg_id in map_of_ids:
+        probability = map_of_ids[msg_id] / map_of_ids['Total']
+        system_entropy = system_entropy + probability * math.log(1.0 / probability)
+
+    return system_entropy
+
+
 def calculate_relative_entropy(normal, measured):
     if normal == 0:
         return 100
@@ -53,6 +62,8 @@ if __name__ == "__main__":
     features = []
     labels = []
     seen_messages = {'Total': 0}
+    previous_entropy = 0
+    current_entropy = 0
 
     for i in range(0, len(can_msgs)):
         if (i - 1) % 10000 == 0:
@@ -65,10 +76,14 @@ if __name__ == "__main__":
 
         [p, q] = get_probability_distributions(can_msgs[i].id_float, known_messages, seen_messages)
 
+        current_entropy = calculate_entropy(seen_messages)
+        if i == 1:
+            previous_entropy = current_entropy
+
         features.append([can_msgs[i].id_float,
                          find_num_occurrences_in_last_second(i, can_msgs[i].id_float,
                                                              can_msgs[i].timestamp, can_msgs),
-                         calculate_relative_entropy(q, p)])
+                         calculate_relative_entropy(q, p), current_entropy - previous_entropy])
         labels.append([1, 0])
 
         if i < len(can_msgs) - 1 and np.random.randint(0, 10) == 0:  # 20% chance of insertion
@@ -86,8 +101,10 @@ if __name__ == "__main__":
             features.append([rand_id,
                              find_num_occurrences_in_last_second(i, rand_id,
                                                                  new_time_stamp, can_msgs),
-                             calculate_relative_entropy(q, p)])
+                             calculate_relative_entropy(q, p), current_entropy - previous_entropy])
             labels.append([0, 1])
+
+        previous_entropy = current_entropy
 
     print('Processed all data!')
     nn = classifier.SimpleNN(features, labels)
