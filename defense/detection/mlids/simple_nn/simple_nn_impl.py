@@ -34,3 +34,6 @@ class SimpleNN:
 
         print(self.sess.run(self.accuracy, feed_dict={self.features: features,
                                                       self.actual_labels: labels}))
+
+        self.saver = tf.train.Saver()
+        self.saver.save(self.sess, 'simple_nn_model')
