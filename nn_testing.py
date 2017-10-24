@@ -2,6 +2,7 @@ import os
 import numpy as np
 import json
 import math
+import tensorflow as tf
 
 from defense import fileio
 import defense.detection.mlids.simple_nn.simple_nn_impl as classifier
@@ -49,7 +50,7 @@ def find_num_occurrences_in_last_second(index, msg_id, timestamp, messages):
     return count
 
 
-if __name__ == "__main__":
+def train_model():
     known_messages = {}
     with open(probability_file, 'r') as infile:
         temp_msgs = json.load(infile)
@@ -88,7 +89,7 @@ if __name__ == "__main__":
 
         if i < len(can_msgs) - 1 and np.random.randint(0, 10) == 0:  # 20% chance of insertion
             rand_id = np.random.randint(0, 5001)
-            new_time_stamp = (can_msgs[i].timestamp + can_msgs[i+1].timestamp) / 2
+            new_time_stamp = (can_msgs[i].timestamp + can_msgs[i + 1].timestamp) / 2
 
             seen_messages['Total'] = seen_messages['Total'] + 1
             if rand_id not in seen_messages:
@@ -108,3 +109,15 @@ if __name__ == "__main__":
 
     print('Processed all data!')
     nn = classifier.SimpleNN(features, labels)
+
+
+def load_and_run_model():
+    with tf.Session() as sess:
+        new_saver = tf.train.import_meta_graph('simple_nn_model.meta')
+        new_saver.restore(sess, tf.train.latest_checkpoint('./'))
+        print(sess.run('W:0'))
+
+
+if __name__ == "__main__":
+   train_model()
+   load_and_run_model()
