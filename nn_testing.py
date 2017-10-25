@@ -36,6 +36,7 @@ probability_file = 'data/analysis_dump/id_occurrences.json'
 
 wd = os.getcwd()
 rec_2 = wd + '/data/logs/recording2.log'
+rec_1 = wd + '/data/logs/recording1.log'
 #  files = [wd + '/data/logs/recording1.log', wd + '/data/logs/recording2.log']
 
 
@@ -112,12 +113,99 @@ def train_model():
 
 
 def load_and_run_model():
+    known_messages = {}
+    with open(probability_file, 'r') as infile:
+        temp_msgs = json.load(infile)
+
+    for key in temp_msgs:
+        known_messages[int(key, 16)] = temp_msgs[key]
+
+    can_msgs = fileio.log_parser(rec_1)
+
+    features = []
+    labels = []
+    seen_messages = {'Total': 0}
+    previous_entropy = 0
+    current_entropy = 0
+
+    malicious_accuracy = [0, 0]
+
     with tf.Session() as sess:
         new_saver = tf.train.import_meta_graph('simple_nn_model.meta')
         new_saver.restore(sess, tf.train.latest_checkpoint('./'))
-        print(sess.run('W:0'))
+
+        x = tf.placeholder(tf.float32, [None, 4])
+        graph = tf.get_default_graph()
+        weights = graph.get_tensor_by_name('W:0')
+        biases = graph.get_tensor_by_name('b:0')
+
+        prediction = tf.nn.softmax(tf.matmul(x, weights) + biases)
+
+        print('Restored model!')
+
+        for i in range(0, len(can_msgs)):
+            if (i - 1) % 1000 == 0:
+                print('Processed ' + str(i - 1) + ' of ' + str(len(can_msgs)))
+
+            seen_messages['Total'] = seen_messages['Total'] + 1
+            if can_msgs[i].id_float not in seen_messages:
+                seen_messages[can_msgs[i].id_float] = 0
+            seen_messages[can_msgs[i].id_float] = seen_messages[can_msgs[i].id_float] + 1
+
+            [p, q] = get_probability_distributions(can_msgs[i].id_float, known_messages,
+                                                   seen_messages)
+
+            current_entropy = calculate_entropy(seen_messages)
+            if i == 1:
+                previous_entropy = current_entropy
+
+            features.append([can_msgs[i].id_float,
+                             find_num_occurrences_in_last_second(i, can_msgs[i].id_float,
+                                                                 can_msgs[i].timestamp, can_msgs),
+                             calculate_relative_entropy(q, p), current_entropy - previous_entropy])
+
+            labels.append([1, 0])
+
+            if i < len(can_msgs) - 1 and np.random.randint(0, 10) == 0:  # 10% chance of insertion
+                rand_id = np.random.randint(0, 5001)
+                new_time_stamp = (can_msgs[i].timestamp + can_msgs[i + 1].timestamp) / 2
+
+                seen_messages['Total'] = seen_messages['Total'] + 1
+                if rand_id not in seen_messages:
+                    seen_messages[rand_id] = 0
+                seen_messages[rand_id] = seen_messages[rand_id] + 1
+
+                [p, q] = get_probability_distributions(rand_id, known_messages,
+                                                       seen_messages)
+
+                features.append([rand_id,
+                                 find_num_occurrences_in_last_second(i, rand_id,
+                                                                     new_time_stamp, can_msgs),
+                                 calculate_relative_entropy(q, p),
+                                 current_entropy - previous_entropy])
+                labels.append([0, 1])
+
+                # classification = sess.run(tf.argmax(prediction, 1), feed_dict={x: features})
+                # print('Injected ' + str(rand_id))
+                # is_caught = '\tWas Caught' if classification[len(classification) - 1] == 1 \
+                #     else '\tWas Not Caught'
+                # print(is_caught)
+                # if input() == 'q':
+                #     break
+
+            previous_entropy = current_entropy
+
+        classification = sess.run(tf.argmax(prediction, 1), feed_dict={x: features})
+
+        for i in range(0, len(labels)):
+            if labels[i][1] == 1:
+                malicious_accuracy[1] = malicious_accuracy[1] + 1
+                if classification[i] == 1:
+                    malicious_accuracy[0] = malicious_accuracy[0] + 1
+
+        print('Classification accuracy = ' + str(malicious_accuracy[0] / malicious_accuracy[1] * 100) + '%')
 
 
 if __name__ == "__main__":
-   train_model()
-   load_and_run_model()
+    # train_model()
+    load_and_run_model()
