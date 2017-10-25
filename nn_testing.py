@@ -88,7 +88,7 @@ def train_model():
                          calculate_relative_entropy(q, p), current_entropy - previous_entropy])
         labels.append([1, 0])
 
-        if i < len(can_msgs) - 1 and np.random.randint(0, 10) == 0:  # 20% chance of insertion
+        if i < len(can_msgs) - 1 and np.random.randint(0, 5) == 0:  # 20% chance of insertion
             rand_id = np.random.randint(0, 5001)
             new_time_stamp = (can_msgs[i].timestamp + can_msgs[i + 1].timestamp) / 2
 
@@ -129,6 +129,7 @@ def load_and_run_model():
     current_entropy = 0
 
     malicious_accuracy = [0, 0]
+    classification_accuracy = [0, 0]
 
     with tf.Session() as sess:
         new_saver = tf.train.import_meta_graph('simple_nn_model.meta')
@@ -198,14 +199,19 @@ def load_and_run_model():
         classification = sess.run(tf.argmax(prediction, 1), feed_dict={x: features})
 
         for i in range(0, len(labels)):
-            if labels[i][1] == 1:
+            classification_accuracy[1] = classification_accuracy[1] + 1
+            if labels[i][0] == 1 and classification[i] == 0:
+                classification_accuracy[0] = classification_accuracy[0] + 1
+            elif labels[i][1] == 1:
                 malicious_accuracy[1] = malicious_accuracy[1] + 1
                 if classification[i] == 1:
                     malicious_accuracy[0] = malicious_accuracy[0] + 1
+                    classification_accuracy[0] = classification_accuracy[0] + 1
 
-        print('Classification accuracy = ' + str(malicious_accuracy[0] / malicious_accuracy[1] * 100) + '%')
+        print('Classification accuracy = ' + str(classification_accuracy[0] / classification_accuracy[1] * 100) + '%')
+        print('Percentage caught = ' + str(malicious_accuracy[0] / malicious_accuracy[1] * 100) + '%')
 
 
 if __name__ == "__main__":
-    # train_model()
+    train_model()
     load_and_run_model()
