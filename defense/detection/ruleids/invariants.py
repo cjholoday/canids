@@ -17,7 +17,7 @@ def check_invariants(msg_log):
     """
 
     # A list of all invariant checking functions
-    invariant_checks = [check_nonzero_id]
+    invariant_checks = [check_nonzero_id,check_many_id]
 
     # Check all invariants
     for invariant_check in invariant_checks:
@@ -34,3 +34,23 @@ def check_nonzero_id(msg_log):
         return "message sent with a zero id"
     else:
         return None
+
+def check_many_id(msg_log):
+    """ Checks that the id isn't the same for x times"""
+    i = 1
+    x = 0
+    while i < len(msg_log):
+       if msg_log[i].arbitration_id == msg_log[i-1].arbitration_id:
+            x+=1
+
+       if x == 50:
+             return "messages have repeating arbitration id"
+    
+       i+=1
+       return None
+
+	
+			
+
+
+

@@ -5,7 +5,7 @@ import can
 from can.interfaces.interface import Bus
 #can.rc['interface'] = 'socketcan_native' #alternative
 can.rc['interface'] = 'socketcan_ctypes'
-can.rc['channel'] = 'can0'
+can.rc['channel'] = 'vcan0'
 bus = Bus()
 
 #start = default_timer()
