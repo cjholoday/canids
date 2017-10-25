@@ -1,0 +1,8 @@
+2 vcan 1
+python3 interframe_spacing_test.py vcan0 0 send 1 1 1
+python3 interframe_spacing_test.py vcan0 0 receive 0 0 0
+
+3 vcan 1
+python3 interframe_spacing_test.py vcan0 0 send 4 4 4
+python3 interframe_spacing_test.py vcan0 0 send 2 2 2
+python3 interframe_spacing_test.py vcan0 0 receive 0 0 0
