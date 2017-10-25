@@ -5,7 +5,7 @@ import sys
 from signal import *
 from random import uniform
 
-#python3 interframe_spacing_test.py [device_name] [vitrate] [send/receive] [ID] [length] [data]
+#"can1", bitrate_int, "receive", ID, length, data]
 
 channel_in = sys.argv[1]
 bitrate = int(sys.argv[2])
@@ -25,11 +25,11 @@ def clean(*args):
     sys.exit(0)
 
 if __name__ == '__main__':
-    
+
     signal(SIGTERM, clean)
-    
+
     count = 0
-    
+
     if(send_recv == "send"):
         message = can.Message(extended_id = False, is_error_frame = False, arbitration_id = id_in, data = [data]*length)
         while 1:
@@ -37,10 +37,11 @@ if __name__ == '__main__':
             bus.send(message)
             count += 1
             out[8] = str(count)
-            
+
     elif(send_recv == "receive"):
         print()
         while 1:
             print(bus.recv())
-            count += 1 
+            count += 1
             out[8] = str(count)
+~                                 

@@ -1,8 +1,38 @@
-2 vcan 1
-python3 interframe_spacing_test.py vcan0 0 send 1 1 1
-python3 interframe_spacing_test.py vcan0 0 receive 0 0 0
+x 2 vcan 1
+python3 hardware/interframe_spacing_test.py vcan0 0 send 1 1 1
+python3 hardware/interframe_spacing_test.py vcan0 0 receive 0 0 0
 
-3 vcan 1
-python3 interframe_spacing_test.py vcan0 0 send 4 4 4
-python3 interframe_spacing_test.py vcan0 0 send 2 2 2
-python3 interframe_spacing_test.py vcan0 0 receive 0 0 0
+X 3 vcan 1
+candump vcan0
+python3 hardware/interframe_spacing_test.py vcan0 0 send 4 4 4
+python3 hardware/interframe_spacing_test.py vcan0 0 send 2 2 2
+
+x 3 vcan 1
+candump vcan0
+python3 data/send_from_log.py vcan0 data/logs/recording1.log
+python3 attack.py -q -c vcan0 dos
+
+3 can 3
+candump can0
+python3 data/send_from_log.py can1 data/logs/recording1.log
+python3 attack.py -q -c can2 dos
+
+reference:
+
+python3 can_test.py [time_per_test][time_betw_cmds][time_betw_tests]
+[num commands][device type][num devices]
+[command 0]
+.
+.
+.
+[command n-1]
+
+python3 hardware/interframe_spacing_test.py [device_name] [vitrate] [send/receive] [ID] [length] [data]
+
+python3 data/send_from_log.py [device name] [logfile]
+logfiles: data/logs recording1.log, recording.log, spoof.log, spoof_50.log, spoof_170.log
+
+python3 defense/response/response.py
+
+
+ 
