@@ -7,10 +7,14 @@ candump vcan0
 python3 hardware/interframe_spacing_test.py vcan0 0 send 4 4 4
 python3 hardware/interframe_spacing_test.py vcan0 0 send 2 2 2
 
-x 3 vcan 1
+3 vcan 1
 candump vcan0
 python3 data/send_from_log.py vcan0 data/logs/recording1.log
 python3 attack.py -q -c vcan0 dos
+
+x 2 can 2
+candump can0
+python3 attack.py -q -c can1 fuzz
 
 3 can 3
 candump can0
@@ -19,7 +23,7 @@ python3 attack.py -q -c can2 dos
 
 reference:
 
-python3 can_test.py [time_per_test][time_betw_cmds][time_betw_tests]
+python3 can_test.py [script file] [time_per_test][time_betw_cmds][time_betw_tests][bitrate]
 [num commands][device type][num devices]
 [command 0]
 .

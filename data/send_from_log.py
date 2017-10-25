@@ -43,7 +43,8 @@ if __name__ == '__main__':
 
     while 1:
         for temp in messages:
-            while round(default_timer()-start, 2) != round(temp.time, 2):
+           # while round(default_timer()-start, 2) != round(temp.time, 2):
+            while default_timer()-start < temp.time:
                 continue
             #temp.print_Message()
             send_message(temp)

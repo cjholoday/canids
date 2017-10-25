@@ -20,7 +20,7 @@ time_betw_cmds = int(sys.argv[3])
 time_betw_tests = int(sys.argv[4])
 
 max_devices = int('3')
-bitrate = '10000'
+bitrate = sys.argv[5]
 
 def setup(device, num_devices):
 
@@ -36,7 +36,7 @@ def setup(device, num_devices):
         if device == 'vcan':
             pre_linkup[5] = device + str(i)
             linkup[5] = device + str(i)
-           #subprocess.call(pre_linkup)
+            subprocess.check_call(pre_linkup)
         elif device == 'can':
             linkup[4] = device + str(i)
         subprocess.check_call(linkup)
@@ -57,10 +57,14 @@ def run(cmds, num_cmds):
 def takedown(device, num_devices):
 
     takedown = ["sudo", "ip", "link", "set", "", "down"]
-    
+    post_takedown = ["sudo", "ip", "link", "delete", ""]   
+ 
     for i in range(num_devices):
         takedown[4] = device + str(i)
         subprocess.check_call(takedown)
+        if device == 'vcan':
+            post_takedown[4] = device + str(i)
+            subprocess.check_call(post_takedown)
 
 def do_cmds(cmds,index,num_cmds):
 
