@@ -186,13 +186,15 @@ def load_and_run_model():
                                  current_entropy - previous_entropy])
                 labels.append([0, 1])
 
-                # classification = sess.run(tf.argmax(prediction, 1), feed_dict={x: features})
-                # print('Injected ' + str(rand_id))
-                # is_caught = '\tWas Caught' if classification[len(classification) - 1] == 1 \
-                #     else '\tWas Not Caught'
-                # print(is_caught)
-                # if input() == 'q':
-                #     break
+                classification = sess.run(tf.argmax(prediction, 1), feed_dict={x: features})
+                print('Injected ' + str(rand_id))
+                is_caught = '\tWas Caught' if classification[len(classification) - 1] == 1 \
+                    else '\tWas Not Caught'
+                print(is_caught)
+                if input() == 'q':
+                    break
+            else:
+                print('No injection')
 
             previous_entropy = current_entropy
 
@@ -213,5 +215,5 @@ def load_and_run_model():
 
 
 if __name__ == "__main__":
-    train_model()
+    # train_model()
     load_and_run_model()
