@@ -23,17 +23,26 @@ def detect_attacks(detection_q, quiet, channel):
     while True:
         can_msg = bus.recv(timeout=1)
         if can_msg:
-            print(can_msg) # useful for debugging
+            if not quiet:
+                print(can_msg) # useful for debugging
             msg_log.append(can_msg)
             invariant_broken = invariants.check_invariants(msg_log)
             if invariant_broken:
                 detection_q.put(msg_log[-1])
-                attack_caught(msg_log, invariant_broken)
+                attack_caught(msg_log, invariant_broken, quiet)
 
 
-def attack_caught(msg_log, invariant_broken):
-    # XXX TODO: print out more info
-    print("Attack detected")
+def attack_caught(msg_log, invariant_broken, quiet):
+    """Print out info on the attack that was detected"""
+    if quiet:
+        return
+
+    print("ATTACK DETECTED")
+    print("    Invariant type: {}".format(invariant_broken))
+    print("    Messages seen so far: {}".format(len(msg_log)))
+    print("    (The violating message is above)")
+    print("")
+
 
 
 @click.command()
