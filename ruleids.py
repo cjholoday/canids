@@ -1,14 +1,22 @@
 import sys
 
+
+import click
 import can
 from defense.detection.ruleids import invariants
 
 
-def attack_caught(msg_log, invariant_broken):
-    # XXX TODO: print out more info
-    print("Attack detected")
+def detect_attacks(detection_q, quiet, channel):
+    """Runs the invariant based IDS
 
-def detect_attacks():
+    detection_q is used to communicate CAN payloads to a calling process
+    """
+    if channel == None:
+        channel = 'vcan0'
+    can.rc['channel'] = channel
+    can.rc['interface'] = 'socketcan_ctypes'
+    bus = can.interface.Bus()
+
     invariants.init()
 
     msg_log = []
@@ -19,12 +27,33 @@ def detect_attacks():
             msg_log.append(can_msg)
             invariant_broken = invariants.check_invariants(msg_log)
             if invariant_broken:
+                detection_q.put(msg_log[-1])
                 attack_caught(msg_log, invariant_broken)
 
-if __name__ == '__main__':
-    # setup the CAN bus API
-    can.rc['interface'] = 'socketcan_ctypes'
-    can.rc['channel'] = 'vcan0'
-    bus = can.interface.Bus()
 
-    detect_attacks()
+def attack_caught(msg_log, invariant_broken):
+    # XXX TODO: print out more info
+    print("Attack detected")
+
+
+@click.command()
+@click.option('-c', '--channel', type=str,
+        help='Specify which channel on which to listen for attacks (e.g. vcan0)'
+             ' (default=vcan0)')
+@click.option('-q', '--quiet', is_flag=True,
+        help='Suppress all output')
+def cli_wrapper(quiet, channel):
+    detect_attacks(DummyQueue(), quiet, channel)
+
+
+class DummyQueue:
+    """
+    We don't need a detection queue unless 'detect_attacks' is being called
+    from another process. Use a dummy queue when we are only using one process
+    """
+    def put(self, can_msg):
+        pass # do nothing
+
+
+if __name__ == '__main__':
+    cli_wrapper()
