@@ -1,10 +1,11 @@
 import os
+import numpy as np
 import json
 import math
-import numpy as np
+import tensorflow as tf
 
 from defense import fileio
-from defense.detection.mlids.classifier_trainer import MessageClassifierTrainer
+import defense.detection.mlids.simple_nn.simple_nn_impl as classifier
 
 
 def calculate_entropy(map_of_ids):
@@ -50,7 +51,7 @@ def find_num_occurrences_in_last_second(index, msg_id, timestamp, messages):
     return count
 
 
-def train_model(classifier):
+def train_model():
     known_messages = {}
     with open(probability_file, 'r') as infile:
         temp_msgs = json.load(infile)
@@ -68,8 +69,6 @@ def train_model(classifier):
 
     for i in range(0, len(can_msgs)):
         if (i - 1) % 10000 == 0:
-            if i - 1 != 0:
-                break
             print('Processed ' + str(i - 1) + ' of ' + str(len(can_msgs)))
 
         seen_messages['Total'] = seen_messages['Total'] + 1
@@ -87,7 +86,7 @@ def train_model(classifier):
                          find_num_occurrences_in_last_second(i, can_msgs[i].id_float,
                                                              can_msgs[i].timestamp, can_msgs),
                          calculate_relative_entropy(q, p), current_entropy - previous_entropy])
-        labels.append(0)
+        labels.append([1, 0])
 
         if i < len(can_msgs) - 1 and np.random.randint(0, 5) == 0:  # 20% chance of insertion
             rand_id = np.random.randint(0, 5001)
@@ -105,16 +104,15 @@ def train_model(classifier):
                              find_num_occurrences_in_last_second(i, rand_id,
                                                                  new_time_stamp, can_msgs),
                              calculate_relative_entropy(q, p), current_entropy - previous_entropy])
-            labels.append(1)
+            labels.append([0, 1])
 
         previous_entropy = current_entropy
 
     print('Processed all data!')
-    classifier.train_classifier(features, labels)
-    print('Trained!')
+    nn = classifier.SimpleNN(features, labels)
 
 
-def test_model(classifier):
+def load_and_run_model():
     known_messages = {}
     with open(probability_file, 'r') as infile:
         temp_msgs = json.load(infile)
@@ -130,72 +128,92 @@ def test_model(classifier):
     previous_entropy = 0
     current_entropy = 0
 
-    for i in range(0, len(can_msgs)):
-        if i == 100:
-            break
-        if (i - 1) % 10000 == 0:
-            print('Processed ' + str(i - 1) + ' of ' + str(len(can_msgs)))
+    malicious_accuracy = [0, 0]
+    classification_accuracy = [0, 0]
 
-        seen_messages['Total'] = seen_messages['Total'] + 1
-        if can_msgs[i].id_float not in seen_messages:
-            seen_messages[can_msgs[i].id_float] = 0
-        seen_messages[can_msgs[i].id_float] = seen_messages[can_msgs[i].id_float] + 1
+    with tf.Session() as sess:
+        new_saver = tf.train.import_meta_graph('simple_nn_model.meta')
+        new_saver.restore(sess, tf.train.latest_checkpoint('./'))
 
-        [p, q] = get_probability_distributions(can_msgs[i].id_float, known_messages, seen_messages)
+        x = tf.placeholder(tf.float32, [None, 4])
+        graph = tf.get_default_graph()
+        weights = graph.get_tensor_by_name('W:0')
+        biases = graph.get_tensor_by_name('b:0')
 
-        current_entropy = calculate_entropy(seen_messages)
-        if i == 1:
-            previous_entropy = current_entropy
+        prediction = tf.nn.softmax(tf.matmul(x, weights) + biases)
 
-        features.append([can_msgs[i].id_float,
-                         find_num_occurrences_in_last_second(i, can_msgs[i].id_float,
-                                                             can_msgs[i].timestamp, can_msgs),
-                         calculate_relative_entropy(q, p), current_entropy - previous_entropy])
-        labels.append(0)
+        print('Restored model!')
 
-        if i < len(can_msgs) - 1 and np.random.randint(0, 5) == 0:  # 20% chance of insertion
-            rand_id = np.random.randint(0, 5001)
-            new_time_stamp = (can_msgs[i].timestamp + can_msgs[i + 1].timestamp) / 2
+        for i in range(0, len(can_msgs)):
+            if (i - 1) % 1000 == 0:
+                print('Processed ' + str(i - 1) + ' of ' + str(len(can_msgs)))
 
             seen_messages['Total'] = seen_messages['Total'] + 1
-            if rand_id not in seen_messages:
-                seen_messages[rand_id] = 0
-            seen_messages[rand_id] = seen_messages[rand_id] + 1
+            if can_msgs[i].id_float not in seen_messages:
+                seen_messages[can_msgs[i].id_float] = 0
+            seen_messages[can_msgs[i].id_float] = seen_messages[can_msgs[i].id_float] + 1
 
-            [p, q] = get_probability_distributions(rand_id, known_messages,
+            [p, q] = get_probability_distributions(can_msgs[i].id_float, known_messages,
                                                    seen_messages)
 
-            features.append([rand_id,
-                             find_num_occurrences_in_last_second(i, rand_id,
-                                                                 new_time_stamp, can_msgs),
+            current_entropy = calculate_entropy(seen_messages)
+            if i == 1:
+                previous_entropy = current_entropy
+
+            features.append([can_msgs[i].id_float,
+                             find_num_occurrences_in_last_second(i, can_msgs[i].id_float,
+                                                                 can_msgs[i].timestamp, can_msgs),
                              calculate_relative_entropy(q, p), current_entropy - previous_entropy])
-            labels.append(1)
 
-        previous_entropy = current_entropy
+            labels.append([1, 0])
 
-    print('Processed all data!')
-    predictions = classifier.predict_class(features)
+            if i < len(can_msgs) - 1 and np.random.randint(0, 10) == 0:  # 10% chance of insertion
+                rand_id = np.random.randint(0, 5001)
+                new_time_stamp = (can_msgs[i].timestamp + can_msgs[i + 1].timestamp) / 2
 
-    num_correct = 0
-    num_malicious = 0
-    num_caught = 0
-    num_false_positives = 0
-    for i in range(0, len(predictions)):
-        if int(predictions[i][0]) == labels[i]:
-            num_correct += 1
-        if labels[i] == 1:
-            num_malicious += 1
-            if int(predictions[i][0]) == 1:
-                num_caught += 1
-        if int(predictions[i][0]) == 1 and labels[i] == 0:
-            num_false_positives += 1
+                seen_messages['Total'] = seen_messages['Total'] + 1
+                if rand_id not in seen_messages:
+                    seen_messages[rand_id] = 0
+                seen_messages[rand_id] = seen_messages[rand_id] + 1
 
-    print('Percentage correct: ' + str(num_correct / len(labels) * 100))
-    print('Percentage caught: ' + str(num_caught / num_malicious * 100))
-    print('Percentage of false positives: ' + str(num_false_positives / len(labels) * 100))
+                [p, q] = get_probability_distributions(rand_id, known_messages,
+                                                       seen_messages)
+
+                features.append([rand_id,
+                                 find_num_occurrences_in_last_second(i, rand_id,
+                                                                     new_time_stamp, can_msgs),
+                                 calculate_relative_entropy(q, p),
+                                 current_entropy - previous_entropy])
+                labels.append([0, 1])
+
+                classification = sess.run(tf.argmax(prediction, 1), feed_dict={x: features})
+                print('Injected ' + str(rand_id))
+                is_caught = '\tWas Caught' if classification[len(classification) - 1] == 1 \
+                    else '\tWas Not Caught'
+                print(is_caught)
+                if input() == 'q':
+                    break
+            else:
+                print('No injection')
+
+            previous_entropy = current_entropy
+
+        classification = sess.run(tf.argmax(prediction, 1), feed_dict={x: features})
+
+        for i in range(0, len(labels)):
+            classification_accuracy[1] = classification_accuracy[1] + 1
+            if labels[i][0] == 1 and classification[i] == 0:
+                classification_accuracy[0] = classification_accuracy[0] + 1
+            elif labels[i][1] == 1:
+                malicious_accuracy[1] = malicious_accuracy[1] + 1
+                if classification[i] == 1:
+                    malicious_accuracy[0] = malicious_accuracy[0] + 1
+                    classification_accuracy[0] = classification_accuracy[0] + 1
+
+        print('Classification accuracy = ' + str(classification_accuracy[0] / classification_accuracy[1] * 100) + '%')
+        print('Percentage caught = ' + str(malicious_accuracy[0] / malicious_accuracy[1] * 100) + '%')
 
 
 if __name__ == "__main__":
-    msg_classifier = MessageClassifierTrainer(None)
-    train_model(msg_classifier)
-    test_model(msg_classifier)
+    # train_model()
+    load_and_run_model()
