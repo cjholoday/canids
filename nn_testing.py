@@ -68,8 +68,6 @@ def train_model(classifier):
 
     for i in range(0, len(can_msgs)):
         if (i - 1) % 10000 == 0:
-            if i - 1 != 0:
-                break
             print('Processed ' + str(i - 1) + ' of ' + str(len(can_msgs)))
 
         seen_messages['Total'] = seen_messages['Total'] + 1
@@ -86,7 +84,7 @@ def train_model(classifier):
         features.append([can_msgs[i].id_float,
                          find_num_occurrences_in_last_second(i, can_msgs[i].id_float,
                                                              can_msgs[i].timestamp, can_msgs),
-                         calculate_relative_entropy(q, p), current_entropy - previous_entropy])
+                         calculate_relative_entropy(q, p), current_entropy - previous_entropy, 1])
         labels.append(0)
 
         if i < len(can_msgs) - 1 and np.random.randint(0, 5) == 0:  # 20% chance of insertion
@@ -104,7 +102,8 @@ def train_model(classifier):
             features.append([rand_id,
                              find_num_occurrences_in_last_second(i, rand_id,
                                                                  new_time_stamp, can_msgs),
-                             calculate_relative_entropy(q, p), current_entropy - previous_entropy])
+                             calculate_relative_entropy(q, p), current_entropy - previous_entropy,
+                             20])
             labels.append(1)
 
         previous_entropy = current_entropy
@@ -131,8 +130,6 @@ def test_model(classifier):
     current_entropy = 0
 
     for i in range(0, len(can_msgs)):
-        if i == 100:
-            break
         if (i - 1) % 10000 == 0:
             print('Processed ' + str(i - 1) + ' of ' + str(len(can_msgs)))
 
@@ -180,6 +177,7 @@ def test_model(classifier):
     num_malicious = 0
     num_caught = 0
     num_false_positives = 0
+    num_classified_malicious = 0
     for i in range(0, len(predictions)):
         if int(predictions[i][0]) == labels[i]:
             num_correct += 1
@@ -187,12 +185,18 @@ def test_model(classifier):
             num_malicious += 1
             if int(predictions[i][0]) == 1:
                 num_caught += 1
-        if int(predictions[i][0]) == 1 and labels[i] == 0:
-            num_false_positives += 1
+        if int(predictions[i][0]) == 1:
+            num_classified_malicious += 1
+            if labels[i] == 0:
+                num_false_positives += 1
+
+    if num_classified_malicious == 0:
+        num_classified_malicious = 1
 
     print('Percentage correct: ' + str(num_correct / len(labels) * 100))
     print('Percentage caught: ' + str(num_caught / num_malicious * 100))
-    print('Percentage of false positives: ' + str(num_false_positives / len(labels) * 100))
+    print('Percentage of false positives: ' + str(num_false_positives / num_classified_malicious
+                                                  * 100))
 
 
 if __name__ == "__main__":

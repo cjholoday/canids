@@ -22,13 +22,14 @@ class MessageClassifierTrainer:
                                                           self.occurrences_column,
                                                           self.rel_entropy_column,
                                                           self.delta_entropy],
-                                         hidden_units=[4, 8, 6, 4, 2],
+                                         hidden_units=[4, 8, 16, 32, 16, 8, 4, 2],
                                          model_dir=model_destination_dir,
                                          optimizer=tf.train.ProximalAdagradOptimizer(
                                              learning_rate=0.1,
                                              l1_regularization_strength=0.001
                                          ),
-                                         n_classes=2)
+                                         n_classes=2,
+                                         weight_column='weights')
         print('Finished setting up DNNClassifier')
 
     def train_classifier(self, msgs, labels):
@@ -36,7 +37,8 @@ class MessageClassifierTrainer:
         Trains DNN Classifier
 
         :param msgs: list of features corresponding to each message in the form
-        [[Message ID, Occurrences in last second, Relative Entropy, Change in System Entropy]]
+        [[Message ID, Occurrences in last second, Relative Entropy, Change in System Entropy,
+        weight]]
         :param labels: list of labels for each message, 1 for malicious and 0 for normal
         :return: None
         :raises ValueError: if the number of messages and the number of labels are not equal
@@ -49,16 +51,19 @@ class MessageClassifierTrainer:
         occurrences = []
         rel_entropies = []
         delta_entropies = []
+        weights = []
         for msg in msgs:
             msg_ids.append(msg[0])
             occurrences.append(msg[1])
             rel_entropies.append(msg[2])
             delta_entropies.append(msg[3])
+            weights.append(msg[4])
 
         x = {'msg_id': np.array(msg_ids),
              'occurrences_in_last_s': np.array(occurrences),
              'relative_entropy': np.array(rel_entropies),
-             'delta_entropy': np.array(delta_entropies)}
+             'delta_entropy': np.array(delta_entropies),
+             'weights': np.array(weights)}
 
         y = np.array(labels)
 
