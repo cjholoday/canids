@@ -3,13 +3,14 @@ import tensorflow as tf
 
 
 class MessageClassifierTrainer:
-    def __init__(self, model_destination_dir):
+    def __init__(self, model_destination_dir=None):
         """
         Class for training DNN classifier in TensorFlow
 
         :param model_destination_dir: Directory to save model to
         """
         print('Setting up DNNClassifier')
+        self.model_dir = model_destination_dir
         self.msg_id_column = tf.feature_column.numeric_column('msg_id', dtype=tf.float32)
         self.occurrences_column = tf.feature_column.numeric_column('occurrences_in_last_s',
                                                                    dtype=tf.float32)
@@ -23,7 +24,7 @@ class MessageClassifierTrainer:
                                                           self.rel_entropy_column,
                                                           self.delta_entropy],
                                          hidden_units=[4, 8, 16, 32, 16, 8, 4, 2],
-                                         model_dir=model_destination_dir,
+                                         model_dir=self.model_dir,
                                          optimizer=tf.train.ProximalAdagradOptimizer(
                                              learning_rate=0.1,
                                              l1_regularization_strength=0.001
@@ -69,6 +70,8 @@ class MessageClassifierTrainer:
 
         train_input_fn = tf.estimator.inputs.numpy_input_fn(x, y, num_epochs=None, shuffle=True)
         self.classifier.train(train_input_fn, steps=1000)
+
+        print('Trained classifier!')
 
     def test_classifier(self, msgs, labels):
         """
