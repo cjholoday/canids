@@ -9,8 +9,8 @@ class SimpleNN:
         # Message ID, Occurrences in last second, Relative Entropy, Change in System Entropy
         self.features = tf.placeholder(tf.float32, [None, temp_num_features])
 
-        self.W = tf.Variable(tf.zeros([temp_num_features, 2]))  # Weights
-        self.b = tf.Variable(tf.zeros([2]))  # Bias
+        self.W = tf.Variable(tf.zeros([temp_num_features, 2]), name='W')  # Weights
+        self.b = tf.Variable(tf.zeros([2]), name='b')  # Bias
 
         self.labels = tf.nn.softmax(tf.matmul(self.features, self.W) + self.b)
 
@@ -34,3 +34,6 @@ class SimpleNN:
 
         print(self.sess.run(self.accuracy, feed_dict={self.features: features,
                                                       self.actual_labels: labels}))
+
+        self.saver = tf.train.Saver()
+        self.saver.save(self.sess, 'simple_nn_model')
