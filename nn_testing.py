@@ -199,8 +199,8 @@ def test_model(classifier):
 
     msgs_parsed = []
     for i in range(0, len(can_msgs)):
-        # if i == 10:
-        #     break
+        if i == 20:
+            break
         if (i - 1) % 10000 == 0:
             print('Processed ' + str(i - 1) + ' of ' + str(len(can_msgs)))
 
@@ -223,13 +223,13 @@ def test_model(classifier):
                          calculate_relative_entropy(q, p), current_entropy - previous_entropy, 1])
         labels.append(0)
 
-        # prediction = classifier.prediction_wrapper(msgs_parsed[len(msgs_parsed) - 1], msgs_parsed,
-        #                                            seen_messages)
-        # if prediction is False:
-        #     output_str = 'Valid message is ALLOWED'
-        # else:
-        #     output_str = 'Valid message is CAUGHT'
-        # print(output_str)
+        prediction = classifier.prediction_wrapper(msgs_parsed[len(msgs_parsed) - 1], msgs_parsed,
+                                                   seen_messages)
+        if prediction is False:
+            output_str = 'Valid message is ALLOWED'
+        else:
+            output_str = 'Valid message is CAUGHT'
+        print(output_str)
 
         rand_num = np.random.randint(0, 25)
         if i < len(can_msgs) - 1 and rand_num == 0:  # 4% chance of insertion
@@ -255,14 +255,14 @@ def test_model(classifier):
                              20])
             labels.append(1)
 
-            # prediction = classifier.prediction_wrapper(msgs_parsed[len(msgs_parsed) - 1],
-            #                                            msgs_parsed,
-            #                                            seen_messages)
-            # if prediction is False:
-            #     output_str = 'Malicious message is ALLOWED'
-            # else:
-            #     output_str = 'Malicious message is CAUGHT'
-            # print(output_str)
+            prediction = classifier.prediction_wrapper(msgs_parsed[len(msgs_parsed) - 1],
+                                                       msgs_parsed,
+                                                       seen_messages)
+            if prediction is False:
+                output_str = 'Malicious message is ALLOWED'
+            else:
+                output_str = 'Malicious message is CAUGHT'
+            print(output_str)
         elif i < len(can_msgs) - 1 and rand_num == 1:  # 4% chance of inserting 10 messages with
             # known ids
             rand_idx = np.random.randint(0, 13)
@@ -296,14 +296,14 @@ def test_model(classifier):
                                  20])
                 labels.append(1)
 
-                # prediction = classifier.prediction_wrapper(msgs_parsed[len(msgs_parsed) - 1],
-                #                                            msgs_parsed,
-                #                                            seen_messages)
-                # if prediction is False:
-                #     output_str = 'Malicious message is ALLOWED'
-                # else:
-                #     output_str = 'Malicious message is CAUGHT'
-                # print(output_str)
+                prediction = classifier.prediction_wrapper(msgs_parsed[len(msgs_parsed) - 1],
+                                                           msgs_parsed,
+                                                           seen_messages)
+                if prediction is False:
+                    output_str = 'Malicious message is ALLOWED'
+                else:
+                    output_str = 'Malicious message is CAUGHT'
+                print(output_str)
 
         elif i < len(can_msgs) - 1 and rand_num == 2:  # 4% chance ddos with 10 messages
             rand_id = '000'
@@ -331,14 +331,14 @@ def test_model(classifier):
                                  20])
                 labels.append(1)
 
-                # prediction = classifier.prediction_wrapper(msgs_parsed[len(msgs_parsed) - 1],
-                #                                            msgs_parsed,
-                #                                            seen_messages)
-                # if prediction is False:
-                #     output_str = 'Malicious message is ALLOWED'
-                # else:
-                #     output_str = 'Malicious message is CAUGHT'
-                # print(output_str)
+                prediction = classifier.prediction_wrapper(msgs_parsed[len(msgs_parsed) - 1],
+                                                           msgs_parsed,
+                                                           seen_messages)
+                if prediction is False:
+                    output_str = 'Malicious message is ALLOWED'
+                else:
+                    output_str = 'Malicious message is CAUGHT'
+                print(output_str)
 
         previous_entropy = current_entropy
 
