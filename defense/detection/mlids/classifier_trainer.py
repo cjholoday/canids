@@ -104,16 +104,19 @@ class MessageClassifierTrainer:
         occurrences = []
         rel_entropies = []
         delta_entropies = []
+        weights = []
         for msg in msgs:
             msg_ids.append(msg[0])
             occurrences.append(msg[1])
             rel_entropies.append(msg[2])
             delta_entropies.append(msg[3])
+            weights.append(msg[4])
 
         x = {'msg_id': np.array(msg_ids),
              'occurrences_in_last_s': np.array(occurrences),
              'relative_entropy': np.array(rel_entropies),
-             'delta_entropy': np.array(delta_entropies)}
+             'delta_entropy': np.array(delta_entropies),
+             'weights': np.array(weights)}
 
         y = np.array(labels)
 
