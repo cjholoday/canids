@@ -1,15 +1,23 @@
+import json
+import math
 import numpy as np
 import tensorflow as tf
 
 
-class MessageClassifierTrainer:
-    def __init__(self, model_destination_dir=None):
+class MessageClassifier:
+    def __init__(self, model_destination_dir=None,
+                 probability_file = 'data/analysis_dump/id_occurrences.json'):
         """
         Class for training DNN classifier in TensorFlow
 
         :param model_destination_dir: Directory to save model to
         """
         print('Setting up DNNClassifier')
+
+        self.probability_file = probability_file
+        self.known_messages = self.get_known_messages()
+        self.current_entropy = 0
+
         tf.logging.set_verbosity(tf.logging.INFO)
 
         self.batch_size = 1000
@@ -44,19 +52,19 @@ class MessageClassifierTrainer:
                                          config=config_obj)
         print('Finished setting up DNNClassifier')
 
-    def train_classifier(self, msgs, labels):
+    def train_classifier(self, features, labels):
         """
         Trains DNN Classifier
 
-        :param msgs: list of features corresponding to each message in the form
+        :param features: list of features corresponding to each message in the form
         [[Message ID, Occurrences in last second, Relative Entropy, Change in System Entropy,
         weight]]
         :param labels: list of labels for each message, 1 for malicious and 0 for normal
         :return: None
         :raises ValueError: if the number of messages and the number of labels are not equal
         """
-        if len(msgs) != len(labels):
-            raise ValueError('len(msgs) not equal to len(labels): ' + str(len(msgs))
+        if len(features) != len(labels):
+            raise ValueError('len(msgs) not equal to len(labels): ' + str(len(features))
                              + ' != ' + str(len(labels)))
 
         msg_ids = []
@@ -64,7 +72,7 @@ class MessageClassifierTrainer:
         rel_entropies = []
         delta_entropies = []
         weights = []
-        for msg in msgs:
+        for msg in features:
             msg_ids.append(msg[0])
             occurrences.append(msg[1])
             rel_entropies.append(msg[2])
@@ -86,18 +94,18 @@ class MessageClassifierTrainer:
 
         print('Trained classifier!')
 
-    def test_classifier(self, msgs, labels):
+    def test_classifier(self, features, labels):
         """
         Tests DNN Classifier
 
-        :param msgs: list of features corresponding to each message in the form
+        :param features: list of features corresponding to each message in the form
         [[Message ID, Occurrences in last second, Relative Entropy, Change in System Entropy]]
         :param labels: list of labels for each message, 1 for malicious and 0 for normal
         :return: None
         :raises ValueError: if the number of messages and the number of labels are not equal
         """
-        if len(msgs) != len(labels):
-            raise ValueError('len(msgs) not equal to len(labels): ' + str(len(msgs))
+        if len(features) != len(labels):
+            raise ValueError('len(msgs) not equal to len(labels): ' + str(len(features))
                              + ' != ' + str(len(labels)))
 
         msg_ids = []
@@ -105,7 +113,7 @@ class MessageClassifierTrainer:
         rel_entropies = []
         delta_entropies = []
         weights = []
-        for msg in msgs:
+        for msg in features:
             msg_ids.append(msg[0])
             occurrences.append(msg[1])
             rel_entropies.append(msg[2])
@@ -130,11 +138,11 @@ class MessageClassifierTrainer:
 
         print("\nTest Accuracy: {0:f}\n".format(accuracy_score))
 
-    def predict_class(self, msgs):
+    def predict_class(self, features):
         """
         Uses DNN Classifier to predict message class
 
-        :param msgs: list of features corresponding to each message in the form
+        :param features: list of features corresponding to each message in the form
         [[Message ID, Occurrences in last second, Relative Entropy, Change in System Entropy]]
         :return: list with class predictions
         """
@@ -142,7 +150,7 @@ class MessageClassifierTrainer:
         occurrences = []
         rel_entropies = []
         delta_entropies = []
-        for msg in msgs:
+        for msg in features:
             msg_ids.append(msg[0])
             occurrences.append(msg[1])
             rel_entropies.append(msg[2])
@@ -159,3 +167,77 @@ class MessageClassifierTrainer:
 
         predictions = list(self.classifier.predict(input_fn=predict_input_fn))
         return [p["classes"] for p in predictions]
+
+    def prediction_wrapper(self, can_msg, msg_log_list, msg_occurrences_dict):
+        """
+        Returns prediction from DNN
+
+        :param can_msg: CANMessage, incoming CAN message
+        :param msg_log_list: list of all CAN messages seen, most recent last
+        :param msg_occurrences_dict: dict of seen CAN message IDs with occurrences and key 'Total'
+        :return: True if message is predicted to be malicious, False otherwise
+        """
+        [p, q] = self.get_probability_distributions(can_msg.id_float, msg_occurrences_dict)
+        new_entropy = self.calculate_entropy(msg_occurrences_dict)
+
+        if len(msg_occurrences_dict) == 1:
+            self.current_entropy = new_entropy
+
+        feature = [[can_msg.id_float, self.find_num_occurrences_in_last_second(len(msg_log_list) - 1,
+                                                                               can_msg.id_float,
+                                                                               can_msg.timestamp,
+                                                                               msg_log_list),
+                    self.calculate_relative_entropy(q, p), new_entropy - self.current_entropy]]
+
+        self.current_entropy = new_entropy
+
+        prediction = self.predict_class(feature)[0][0]
+
+        if int(prediction) == 1:
+            return True
+        return False
+
+    def get_known_messages(self):
+        known_messages = {}
+        with open(self.probability_file, 'r') as infile:
+            temp_msgs = json.load(infile)
+
+        for key in temp_msgs:
+            known_messages[int(key, 16)] = temp_msgs[key]
+
+        return known_messages
+
+    @staticmethod
+    def calculate_entropy(map_of_ids):
+        system_entropy = 0
+        for msg_id in map_of_ids:
+            probability = map_of_ids[msg_id] / map_of_ids['Total']
+            system_entropy = system_entropy + probability * math.log(1.0 / probability)
+
+        return system_entropy
+
+    @staticmethod
+    def calculate_relative_entropy(normal, measured):
+        if normal == 0:
+            return 100
+        return measured * math.log(measured / normal)
+
+    def get_probability_distributions(self, msg_id, empirical):
+        if msg_id in self.known_messages:
+            q = self.known_messages[msg_id]['Probability']
+        else:
+            q = 0
+        p = empirical[msg_id] / empirical['Total']
+
+        return [p, q]
+
+    @staticmethod
+    def find_num_occurrences_in_last_second(index, msg_id, timestamp, messages):
+        count = 0
+        for j in range(index, 0, -1):
+            if timestamp - messages[j].timestamp <= 1:
+                if messages[j].id_float == msg_id:
+                    count = count + 1
+            else:
+                break
+        return count
