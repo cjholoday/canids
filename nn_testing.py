@@ -5,6 +5,7 @@ import numpy as np
 
 from defense import fileio
 from defense.detection.mlids.classifier_trainer import MessageClassifierTrainer
+from defense.canclass import CANMessage
 
 
 def calculate_entropy(map_of_ids):
@@ -66,11 +67,14 @@ def train_model(classifier):
     previous_entropy = 0
     current_entropy = 0
 
+    msgs_parsed = []
     for i in range(0, len(can_msgs)):
+        # if i == 100:
+        #     break
         if (i - 1) % 10000 == 0:
-            # if i - 1 != 0:
-            #     break
             print('Processed ' + str(i - 1) + ' of ' + str(len(can_msgs)))
+
+        msgs_parsed.append(can_msgs[i])
 
         seen_messages['Total'] = seen_messages['Total'] + 1
         if can_msgs[i].id_float not in seen_messages:
@@ -85,28 +89,91 @@ def train_model(classifier):
 
         features.append([can_msgs[i].id_float,
                          find_num_occurrences_in_last_second(i, can_msgs[i].id_float,
-                                                             can_msgs[i].timestamp, can_msgs),
+                                                             can_msgs[i].timestamp, msgs_parsed),
                          calculate_relative_entropy(q, p), current_entropy - previous_entropy, 1])
         labels.append(0)
 
-        if i < len(can_msgs) - 1 and np.random.randint(0, 5) == 0:  # 20% chance of insertion
-            rand_id = np.random.randint(0, 5001)
+        rand_num = np.random.randint(0, 25) == 0
+        if i < len(can_msgs) - 1 and rand_num == 0:  # 4% chance of insertion
+            rand_id = "{0:#0{1}X}".format(np.random.randint(0, 5001), 5)[2:]
             new_time_stamp = (can_msgs[i].timestamp + can_msgs[i + 1].timestamp) / 2
 
-            seen_messages['Total'] = seen_messages['Total'] + 1
-            if rand_id not in seen_messages:
-                seen_messages[rand_id] = 0
-            seen_messages[rand_id] = seen_messages[rand_id] + 1
+            new_msg = CANMessage(new_time_stamp, rand_id, 0)
+            msgs_parsed.append(new_msg)
 
-            [p, q] = get_probability_distributions(rand_id, known_messages,
+            seen_messages['Total'] = seen_messages['Total'] + 1
+            if new_msg.id_float not in seen_messages:
+                seen_messages[new_msg.id_float] = 0
+            seen_messages[new_msg.id_float] = seen_messages[new_msg.id_float] + 1
+
+            [p, q] = get_probability_distributions(new_msg.id_float, known_messages,
                                                    seen_messages)
 
-            features.append([rand_id,
-                             find_num_occurrences_in_last_second(i, rand_id,
-                                                                 new_time_stamp, can_msgs),
+            features.append([new_msg.id_float,
+                             find_num_occurrences_in_last_second(len(msgs_parsed) - 1,
+                                                                 new_msg.id_float,
+                                                                 new_time_stamp, msgs_parsed),
                              calculate_relative_entropy(q, p), current_entropy - previous_entropy,
                              20])
             labels.append(1)
+        elif i < len(can_msgs) - 1 and rand_num == 1:  # 4% chance of inserting 10 messages with
+            # known ids
+            rand_idx = np.random.randint(0, 13)
+            count = 0
+            for known_id in known_messages:
+                if count == rand_idx:
+                    rand_id = known_id
+                    break
+                count += 1
+            time_stamp_step = (can_msgs[i + 1].timestamp - can_msgs[i].timestamp) / 11
+
+            for j in range(1, 11):
+                new_time_stamp = can_msgs[i].timestamp + time_stamp_step * i
+                new_msg = CANMessage(new_time_stamp, rand_id, 0)
+                msgs_parsed.append(new_msg)
+
+                seen_messages['Total'] = seen_messages['Total'] + 1
+                if new_msg.id_float not in seen_messages:
+                    seen_messages[new_msg.id_float] = 0
+                seen_messages[new_msg.id_float] = seen_messages[new_msg.id_float] + 1
+
+                [p, q] = get_probability_distributions(new_msg.id_float, known_messages,
+                                                       seen_messages)
+
+                features.append([new_msg.id_float,
+                                 find_num_occurrences_in_last_second(len(msgs_parsed) - 1,
+                                                                     new_msg.id_float,
+                                                                     new_time_stamp, msgs_parsed),
+                                 calculate_relative_entropy(q, p),
+                                 current_entropy - previous_entropy,
+                                 20])
+                labels.append(1)
+
+        elif i < len(can_msgs) - 1 and rand_num == 2:  # 4% chance ddos with 10 messages
+            rand_id = '000'
+            time_stamp_step = (can_msgs[i + 1].timestamp - can_msgs[i].timestamp) / 21
+
+            for j in range(1, 21):
+                new_time_stamp = can_msgs[i].timestamp + time_stamp_step * i
+                new_msg = CANMessage(new_time_stamp, rand_id, 0)
+                msgs_parsed.append(new_msg)
+
+                seen_messages['Total'] = seen_messages['Total'] + 1
+                if new_msg.id_float not in seen_messages:
+                    seen_messages[new_msg.id_float] = 0
+                seen_messages[new_msg.id_float] = seen_messages[new_msg.id_float] + 1
+
+                [p, q] = get_probability_distributions(new_msg.id_float, known_messages,
+                                                       seen_messages)
+
+                features.append([new_msg.id_float,
+                                 find_num_occurrences_in_last_second(len(msgs_parsed) - 1,
+                                                                     new_msg.id_float,
+                                                                     new_time_stamp, msgs_parsed),
+                                 calculate_relative_entropy(q, p),
+                                 current_entropy - previous_entropy,
+                                 20])
+                labels.append(1)
 
         previous_entropy = current_entropy
 
@@ -130,11 +197,14 @@ def test_model(classifier):
     previous_entropy = 0
     current_entropy = 0
 
+    msgs_parsed = []
     for i in range(0, len(can_msgs)):
         # if i == 100:
         #     break
         if (i - 1) % 10000 == 0:
             print('Processed ' + str(i - 1) + ' of ' + str(len(can_msgs)))
+
+        msgs_parsed.append(can_msgs[i])
 
         seen_messages['Total'] = seen_messages['Total'] + 1
         if can_msgs[i].id_float not in seen_messages:
@@ -149,28 +219,91 @@ def test_model(classifier):
 
         features.append([can_msgs[i].id_float,
                          find_num_occurrences_in_last_second(i, can_msgs[i].id_float,
-                                                             can_msgs[i].timestamp, can_msgs),
+                                                             can_msgs[i].timestamp, msgs_parsed),
                          calculate_relative_entropy(q, p), current_entropy - previous_entropy, 1])
         labels.append(0)
 
-        if i < len(can_msgs) - 1 and np.random.randint(0, 5) == 0:  # 20% chance of insertion
-            rand_id = np.random.randint(0, 5001)
+        rand_num = np.random.randint(0, 25) == 0
+        if i < len(can_msgs) - 1 and rand_num == 0:  # 4% chance of insertion
+            rand_id = "{0:#0{1}X}".format(np.random.randint(0, 5001), 5)[2:]
             new_time_stamp = (can_msgs[i].timestamp + can_msgs[i + 1].timestamp) / 2
 
-            seen_messages['Total'] = seen_messages['Total'] + 1
-            if rand_id not in seen_messages:
-                seen_messages[rand_id] = 0
-            seen_messages[rand_id] = seen_messages[rand_id] + 1
+            new_msg = CANMessage(new_time_stamp, rand_id, 0)
+            msgs_parsed.append(new_msg)
 
-            [p, q] = get_probability_distributions(rand_id, known_messages,
+            seen_messages['Total'] = seen_messages['Total'] + 1
+            if new_msg.id_float not in seen_messages:
+                seen_messages[new_msg.id_float] = 0
+            seen_messages[new_msg.id_float] = seen_messages[new_msg.id_float] + 1
+
+            [p, q] = get_probability_distributions(new_msg.id_float, known_messages,
                                                    seen_messages)
 
-            features.append([rand_id,
-                             find_num_occurrences_in_last_second(i, rand_id,
-                                                                 new_time_stamp, can_msgs),
+            features.append([new_msg.id_float,
+                             find_num_occurrences_in_last_second(len(msgs_parsed) - 1,
+                                                                 new_msg.id_float,
+                                                                 new_time_stamp, msgs_parsed),
                              calculate_relative_entropy(q, p), current_entropy - previous_entropy,
                              20])
             labels.append(1)
+        elif i < len(can_msgs) - 1 and rand_num == 1:  # 4% chance of inserting 10 messages with
+            # known ids
+            rand_idx = np.random.randint(0, 13)
+            count = 0
+            for known_id in known_messages:
+                if count == rand_idx:
+                    rand_id = known_id
+                    break
+                count += 1
+            time_stamp_step = (can_msgs[i + 1].timestamp - can_msgs[i].timestamp) / 11
+
+            for j in range(1, 11):
+                new_time_stamp = can_msgs[i].timestamp + time_stamp_step * i
+                new_msg = CANMessage(new_time_stamp, rand_id, 0)
+                msgs_parsed.append(new_msg)
+
+                seen_messages['Total'] = seen_messages['Total'] + 1
+                if new_msg.id_float not in seen_messages:
+                    seen_messages[new_msg.id_float] = 0
+                seen_messages[new_msg.id_float] = seen_messages[new_msg.id_float] + 1
+
+                [p, q] = get_probability_distributions(new_msg.id_float, known_messages,
+                                                       seen_messages)
+
+                features.append([new_msg.id_float,
+                                 find_num_occurrences_in_last_second(len(msgs_parsed) - 1,
+                                                                     new_msg.id_float,
+                                                                     new_time_stamp, msgs_parsed),
+                                 calculate_relative_entropy(q, p),
+                                 current_entropy - previous_entropy,
+                                 20])
+                labels.append(1)
+
+        elif i < len(can_msgs) - 1 and rand_num == 2:  # 4% chance ddos with 10 messages
+            rand_id = '000'
+            time_stamp_step = (can_msgs[i + 1].timestamp - can_msgs[i].timestamp) / 21
+
+            for j in range(1, 21):
+                new_time_stamp = can_msgs[i].timestamp + time_stamp_step * i
+                new_msg = CANMessage(new_time_stamp, rand_id, 0)
+                msgs_parsed.append(new_msg)
+
+                seen_messages['Total'] = seen_messages['Total'] + 1
+                if new_msg.id_float not in seen_messages:
+                    seen_messages[new_msg.id_float] = 0
+                seen_messages[new_msg.id_float] = seen_messages[new_msg.id_float] + 1
+
+                [p, q] = get_probability_distributions(new_msg.id_float, known_messages,
+                                                       seen_messages)
+
+                features.append([new_msg.id_float,
+                                 find_num_occurrences_in_last_second(len(msgs_parsed) - 1,
+                                                                     new_msg.id_float,
+                                                                     new_time_stamp, msgs_parsed),
+                                 calculate_relative_entropy(q, p),
+                                 current_entropy - previous_entropy,
+                                 20])
+                labels.append(1)
 
         previous_entropy = current_entropy
 
