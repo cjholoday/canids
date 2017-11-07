@@ -37,7 +37,7 @@ class MessageClassifierTrainer:
                                          optimizer=tf.train.ProximalAdagradOptimizer(
                                              learning_rate=0.1,
                                              l1_regularization_strength=0.001,
-                                             l2_regularization_strength=3
+                                             l2_regularization_strength=3.0
                                          ),
                                          n_classes=2,
                                          weight_column='weights',

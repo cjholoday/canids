@@ -1,3 +1,4 @@
 /.idea/
+/ml_ids_model
 *__pycache__*
 /plots
