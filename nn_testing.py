@@ -150,7 +150,7 @@ def test_model(classifier):
         features.append([can_msgs[i].id_float,
                          find_num_occurrences_in_last_second(i, can_msgs[i].id_float,
                                                              can_msgs[i].timestamp, can_msgs),
-                         calculate_relative_entropy(q, p), current_entropy - previous_entropy])
+                         calculate_relative_entropy(q, p), current_entropy - previous_entropy, 1])
         labels.append(0)
 
         if i < len(can_msgs) - 1 and np.random.randint(0, 5) == 0:  # 20% chance of insertion
@@ -168,7 +168,8 @@ def test_model(classifier):
             features.append([rand_id,
                              find_num_occurrences_in_last_second(i, rand_id,
                                                                  new_time_stamp, can_msgs),
-                             calculate_relative_entropy(q, p), current_entropy - previous_entropy])
+                             calculate_relative_entropy(q, p), current_entropy - previous_entropy,
+                             20])
             labels.append(1)
 
         previous_entropy = current_entropy
@@ -207,5 +208,5 @@ def test_model(classifier):
 
 if __name__ == "__main__":
     msg_classifier = MessageClassifierTrainer(os.getcwd() + '/ml_ids_model')
-    train_model(msg_classifier)
+    # train_model(msg_classifier)
     test_model(msg_classifier)
