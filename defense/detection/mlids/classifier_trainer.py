@@ -10,6 +10,11 @@ class MessageClassifierTrainer:
         :param model_destination_dir: Directory to save model to
         """
         print('Setting up DNNClassifier')
+        tf.logging.set_verbosity(tf.logging.INFO)
+
+        self.batch_size = 1000
+        self.num_steps = 1000
+
         self.model_dir = model_destination_dir
         self.msg_id_column = tf.feature_column.numeric_column('msg_id', dtype=tf.float32)
         self.occurrences_column = tf.feature_column.numeric_column('occurrences_in_last_s',
@@ -18,19 +23,25 @@ class MessageClassifierTrainer:
                                                                    dtype=tf.float32)
         self.delta_entropy = tf.feature_column.numeric_column('delta_entropy', dtype=tf.float32)
 
+        config_obj = tf.estimator.RunConfig().replace(save_checkpoints_steps=50000,
+                                                      keep_checkpoint_max=2,
+                                                      log_step_count_steps=50000,
+                                                      save_summary_steps=2)
         self.classifier \
             = tf.estimator.DNNClassifier(feature_columns=[self.msg_id_column,
                                                           self.occurrences_column,
                                                           self.rel_entropy_column,
                                                           self.delta_entropy],
-                                         hidden_units=[4, 8, 16, 32, 16, 8, 4, 2],
+                                         hidden_units=[100, 100, 80, 60, 40],
                                          model_dir=self.model_dir,
                                          optimizer=tf.train.ProximalAdagradOptimizer(
                                              learning_rate=0.1,
-                                             l1_regularization_strength=0.001
+                                             l1_regularization_strength=0.001,
+                                             l2_regularization_strength=3
                                          ),
                                          n_classes=2,
-                                         weight_column='weights')
+                                         weight_column='weights',
+                                         config=config_obj)
         print('Finished setting up DNNClassifier')
 
     def train_classifier(self, msgs, labels):
@@ -68,8 +79,10 @@ class MessageClassifierTrainer:
 
         y = np.array(labels)
 
-        train_input_fn = tf.estimator.inputs.numpy_input_fn(x, y, num_epochs=None, shuffle=True)
-        self.classifier.train(train_input_fn, steps=1000)
+        train_input_fn = tf.estimator.inputs.numpy_input_fn(x, y, num_epochs=3,
+                                                            batch_size=self.batch_size,
+                                                            shuffle=True)
+        self.classifier.train(train_input_fn, steps=self.num_steps)
 
         print('Trained classifier!')
 
@@ -104,10 +117,13 @@ class MessageClassifierTrainer:
 
         y = np.array(labels)
 
-        test_input_fn = tf.estimator.inputs.numpy_input_fn(x, y, num_epochs=1, shuffle=False)
+        test_input_fn = tf.estimator.inputs.numpy_input_fn(x, y, num_epochs=1,
+                                                           batch_size=self.batch_size,
+                                                           shuffle=False)
 
         # Evaluate accuracy.
-        accuracy_score = self.classifier.evaluate(input_fn=test_input_fn)["accuracy"]
+        accuracy_score = self.classifier.evaluate(input_fn=test_input_fn,
+                                                  steps=self.num_steps)["accuracy"]
 
         print("\nTest Accuracy: {0:f}\n".format(accuracy_score))
 
@@ -134,7 +150,9 @@ class MessageClassifierTrainer:
              'relative_entropy': np.array(rel_entropies),
              'delta_entropy': np.array(delta_entropies)}
 
-        predict_input_fn = tf.estimator.inputs.numpy_input_fn(x, num_epochs=1, shuffle=False)
+        predict_input_fn = tf.estimator.inputs.numpy_input_fn(x, num_epochs=1,
+                                                              batch_size=self.batch_size,
+                                                              shuffle=False)
 
         predictions = list(self.classifier.predict(input_fn=predict_input_fn))
         return [p["classes"] for p in predictions]

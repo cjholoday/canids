@@ -203,6 +203,6 @@ def test_model(classifier):
 
 
 if __name__ == "__main__":
-    msg_classifier = MessageClassifierTrainer(os.getcwd())
+    msg_classifier = MessageClassifierTrainer(os.getcwd() + '/ml_ids_model')
     train_model(msg_classifier)
     test_model(msg_classifier)
