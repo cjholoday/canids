@@ -68,8 +68,8 @@ def train_model(classifier):
 
     for i in range(0, len(can_msgs)):
         if (i - 1) % 10000 == 0:
-            if i - 1 != 0:
-                break
+            # if i - 1 != 0:
+            #     break
             print('Processed ' + str(i - 1) + ' of ' + str(len(can_msgs)))
 
         seen_messages['Total'] = seen_messages['Total'] + 1
@@ -131,8 +131,8 @@ def test_model(classifier):
     current_entropy = 0
 
     for i in range(0, len(can_msgs)):
-        if i == 100:
-            break
+        # if i == 100:
+        #     break
         if (i - 1) % 10000 == 0:
             print('Processed ' + str(i - 1) + ' of ' + str(len(can_msgs)))
 
@@ -174,6 +174,9 @@ def test_model(classifier):
         previous_entropy = current_entropy
 
     print('Processed all data!')
+
+    classifier.test_classifier(features, labels)
+
     predictions = classifier.predict_class(features)
 
     num_correct = 0
