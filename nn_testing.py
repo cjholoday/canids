@@ -337,6 +337,8 @@ def test_model(classifier):
     print('Percentage caught: ' + str(num_caught / num_malicious * 100))
     print('Percentage of false positives: ' + str(num_false_positives / num_classified_malicious
                                                   * 100))
+    print('Number of malicious messages: ' + str(num_malicious))
+    print('Number of messages: ' + str(len(predictions)))
 
 
 if __name__ == "__main__":
