@@ -395,25 +395,25 @@ def test_model(classifier, print_test):
                 num_false_positives += 1
         if msg_types[i] == 'Valid':
             num_valid += 1
-            if labels[i] == 0:
+            if predictions[i] == 0:
                 num_valid_caught += 1
         elif msg_types[i] == 'Random injection':
             num_injected += 1
-            if labels[i] == 1:
+            if predictions[i] == 1:
                 num_injected_caught += 1
         elif msg_types[i] == 'Spoofing':
             num_spoof += 1
-            if labels[i] == 1:
+            if predictions[i] == 1:
                 num_spoof_caught += 1
         elif msg_types[i] == 'DOS':
             num_dos += 1
-            if labels[i] == 1:
+            if predictions[i] == 1:
                 num_dos_caught += 1
 
     if num_classified_malicious == 0:
         num_classified_malicious = 1
 
-    print('STATISTICS')
+    print('\nSTATISTICS')
     print('Percentage correct: ' + str(num_correct / len(labels) * 100))
     print('Percentage caught: ' + str(num_caught / num_malicious * 100))
     print('Percentage of false positives: ' + str(num_false_positives / num_classified_malicious
