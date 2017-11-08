@@ -1,4 +1,12 @@
-x 2 vcan 1
+2 can 1
+cangen can0
+candump can0
+
+X 2 vcan 1
+candump vcan0
+python3 data/send_from_log.py vcan0 data/logs/recording1.log
+
+X 2 vcan 1
 python3 hardware/interframe_spacing_test.py vcan0 0 send 1 1 1
 python3 hardware/interframe_spacing_test.py vcan0 0 receive 0 0 0
 
@@ -7,29 +15,21 @@ candump vcan0
 python3 hardware/interframe_spacing_test.py vcan0 0 send 4 4 4
 python3 hardware/interframe_spacing_test.py vcan0 0 send 2 2 2
 
-3 vcan 1
+X 3 vcan 1
 candump vcan0
 python3 data/send_from_log.py vcan0 data/logs/recording1.log
 python3 attack.py -q -c vcan0 dos
 
-x 2 can 2
+X 2 can 2
 candump can0
 python3 attack.py -q -c can1 fuzz
 
-3 can 3
+X 3 can 3
 candump can0
 python3 data/send_from_log.py can1 data/logs/recording1.log
 python3 attack.py -q -c can2 dos
 
 reference:
-
-python3 can_test.py [script file] [time_per_test][time_betw_cmds][time_betw_tests][bitrate]
-[num commands][device type][num devices]
-[command 0]
-.
-.
-.
-[command n-1]
 
 python3 hardware/interframe_spacing_test.py [device_name] [vitrate] [send/receive] [ID] [length] [data]
 
