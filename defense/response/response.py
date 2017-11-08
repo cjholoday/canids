@@ -8,15 +8,12 @@ from random import uniform
 #"can1", bitrate_int, "receive", ID, length, data]
 
 channel_in = sys.argv[1]
-bitrate = int(sys.argv[2])
-#send_recv = sys.argv[3]
-#id_in = int(sys.argv[4])
-#length = int(sys.argv[5])
-#data = int(sys.argv[6])
+consec_msgs_in = int(sys.argv[2])
 
 can.rc['interface'] = 'socketcan_ctypes'
 can.rc['channel'] = channel_in
 bus = Bus()
+bitrate = 500
 
 send_recv = "receive"
 out = [channel_in, " | ", send_recv, " | ", "bitrate: ", str(bitrate), " | ", "count: ", "" ]
@@ -43,8 +40,8 @@ if __name__ == '__main__':
                     consecutive_messages = 1
                 last_message_id = id
                 print(consecutive_messages)
-                if consecutive_messages == 10:
-                    print("5 consecutive messages with same ID")
+                if consecutive_messages == consec_msgs_in:
+                    print("%d consecutive messages with same ID" %consec_msgs_in)
                     send_recv = "send"
                     break;
                     #consecutive_messages = 0
@@ -57,5 +54,7 @@ if __name__ == '__main__':
             while 1:
                 sleep(uniform(0.001,0.1))
                 bus.send(message)
+                #if this repsponse succeeds, then there needs to be a detection of success
+                #this would then stop the response, and move back to send_recv = "receive"
 
 
