@@ -198,6 +198,7 @@ def test_model(classifier, print_test):
     current_entropy = 0
 
     msgs_parsed = []
+    msg_types = []
     for i in range(0, len(can_msgs)):
         if print_test is True:
             if i == 20:
@@ -223,7 +224,7 @@ def test_model(classifier, print_test):
                                                              can_msgs[i].timestamp, msgs_parsed),
                          calculate_relative_entropy(q, p), current_entropy - previous_entropy, 1])
         labels.append(0)
-
+        msg_types.append('Valid')
         if print_test is True:
             prediction = classifier.prediction_wrapper(msgs_parsed[len(msgs_parsed) - 1],
                                                        msgs_parsed, seen_messages)
@@ -258,6 +259,8 @@ def test_model(classifier, print_test):
                              calculate_relative_entropy(q, p), current_entropy - previous_entropy,
                              20])
             labels.append(1)
+
+            msg_types.append('Random injection')
 
             if print_test is True:
                 prediction = classifier.prediction_wrapper(msgs_parsed[len(msgs_parsed) - 1],
@@ -303,6 +306,8 @@ def test_model(classifier, print_test):
                                  20])
                 labels.append(1)
 
+                msg_types.append('Spoofing')
+
                 if print_test is True:
                     prediction = classifier.prediction_wrapper(msgs_parsed[len(msgs_parsed) - 1],
                                                                msgs_parsed,
@@ -341,6 +346,8 @@ def test_model(classifier, print_test):
                                  20])
                 labels.append(1)
 
+                msg_types.append('DOS')
+
                 if print_test is True:
                     prediction = classifier.prediction_wrapper(msgs_parsed[len(msgs_parsed) - 1],
                                                                msgs_parsed,
@@ -364,6 +371,17 @@ def test_model(classifier, print_test):
     num_caught = 0
     num_false_positives = 0
     num_classified_malicious = 0
+
+    num_valid = 0
+    num_injected = 0
+    num_spoof = 0
+    num_dos = 0
+
+    num_valid_caught = 0
+    num_injected_caught = 0
+    num_spoof_caught = 0
+    num_dos_caught = 0
+
     for i in range(0, len(predictions)):
         if int(predictions[i][0]) == labels[i]:
             num_correct += 1
@@ -375,14 +393,43 @@ def test_model(classifier, print_test):
             num_classified_malicious += 1
             if labels[i] == 0:
                 num_false_positives += 1
+        if msg_types[i] == 'Valid':
+            num_valid += 1
+            if int(predictions[i][0]) == 0:
+                num_valid_caught += 1
+        elif msg_types[i] == 'Random injection':
+            num_injected += 1
+            if int(predictions[i][0]) == 1:
+                num_injected_caught += 1
+        elif msg_types[i] == 'Spoofing':
+            num_spoof += 1
+            if int(predictions[i][0]) == 1:
+                num_spoof_caught += 1
+        elif msg_types[i] == 'DOS':
+            num_dos += 1
+            if int(predictions[i][0]) == 1:
+                num_dos_caught += 1
 
     if num_classified_malicious == 0:
         num_classified_malicious = 1
 
+    print('\nSTATISTICS')
     print('Percentage correct: ' + str(num_correct / len(labels) * 100))
     print('Percentage caught: ' + str(num_caught / num_malicious * 100))
     print('Percentage of false positives: ' + str(num_false_positives / num_classified_malicious
                                                   * 100))
+
+    print()
+    print('Valid message statistics: ' + str(num_valid_caught) + ' caught / ' + str(num_valid)
+          + ' total = ' + str(num_valid_caught / num_valid))
+    print('Random injection statistics: ' + str(num_injected_caught) + ' caught / '
+          + str(num_injected) + ' total = ' + str(num_injected_caught / num_injected))
+    print('Spoofing statistics: ' + str(num_spoof_caught) + ' caught / ' + str(num_spoof)
+          + ' total = ' + str(num_spoof_caught / num_spoof))
+    print('DOS statistics: ' + str(num_dos_caught) + ' caught / ' + str(num_dos)
+          + ' total = ' + str(num_dos_caught / num_dos))
+
+    print()
     print('Number of malicious messages: ' + str(num_malicious))
     print('Number of messages: ' + str(len(predictions)))
 
@@ -390,4 +437,4 @@ def test_model(classifier, print_test):
 if __name__ == "__main__":
     msg_classifier = MessageClassifier(os.getcwd() + '/ml_ids_model')
     # train_model(msg_classifier)
-    test_model(msg_classifier, True)
+    test_model(msg_classifier, False)
