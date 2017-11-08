@@ -30,7 +30,7 @@ def detect_attacks(detection_q, quiet, channel):
             msg_log.append(new_msg)
             if not quiet:
                 print(can_msg)
-                print(msg_log[len(msg_log) - 1])
+                # print(msg_log[len(msg_log) - 1])
 
             seen_messages['Total'] = seen_messages['Total'] + 1
             if new_msg.id_float not in seen_messages:
@@ -40,7 +40,7 @@ def detect_attacks(detection_q, quiet, channel):
             prediction = ml_ids.prediction_wrapper(new_msg, msg_log, seen_messages)
 
             if prediction is True:
-                print(new_msg.id + ' at timestamp ' + str(new_msg.timestamp) + ' is malicious')
+                print(new_msg.id + ' at timestamp ' + str(new_msg.timestamp) + ' is MALICIOUS')
 
 @click.command()
 @click.option('-c', '--channel', type=str,
