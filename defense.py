@@ -32,6 +32,7 @@ def main(time, channel, quiet, quiet_ruleids, quiet_ml, quiet_response):
     if quiet:
         quiet_ruleids = True
         quiet_response = True
+        quiet_ml = True
     
     ruleids_defense = Process(target=ruleids.detect_attacks, 
                               args=(payloads, quiet_ruleids, channel,))
