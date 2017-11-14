@@ -95,7 +95,7 @@ def train_model(classifier):
 
         rand_num = np.random.randint(0, 25)
         if i < len(can_msgs) - 1 and rand_num == 0:  # 4% chance of insertion
-            rand_id = "{0:#0{1}X}".format(np.random.randint(0, 5001), 5)[2:]
+            rand_id = "{0:#0{1}X}".format(np.random.randint(0, 4096), 5)[2:]
             new_time_stamp = (can_msgs[i].timestamp + can_msgs[i + 1].timestamp) / 2
 
             new_msg = CANMessage(new_time_stamp, rand_id, 0)
@@ -238,7 +238,7 @@ def test_model(classifier, print_test):
         if i < len(can_msgs) - 1 and rand_num == 0:  # 4% chance of insertion
             if print_test is True:
                 print('Inserting message with random ID')
-            rand_id = "{0:#0{1}X}".format(np.random.randint(0, 5001), 5)[2:]
+            rand_id = "{0:#0{1}X}".format(np.random.randint(0, 4096), 5)[2:]
             new_time_stamp = (can_msgs[i].timestamp + can_msgs[i + 1].timestamp) / 2
 
             new_msg = CANMessage(new_time_stamp, rand_id, 0)
