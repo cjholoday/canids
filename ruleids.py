@@ -20,8 +20,14 @@ def detect_attacks(detection_q, quiet, channel):
     invariants.init()
 
     msg_log = []
+    idx_faucet = 0
     while True:
         can_msg = bus.recv(timeout=1)
+
+        can_msg.index = idx_faucet
+        can_msg.defense = 'ruleids'
+        idx_faucet += 1
+
         if can_msg:
             if not quiet:
                 print(can_msg) # useful for debugging
