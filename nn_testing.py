@@ -92,6 +92,7 @@ def train_model(classifier):
                                                              can_msgs[i].timestamp, msgs_parsed),
                          calculate_relative_entropy(q, p), current_entropy - previous_entropy, 1])
         labels.append(0)
+        previous_entropy = current_entropy
 
         rand_num = np.random.randint(0, 25)
         if i < len(can_msgs) - 1 and rand_num == 0:  # 4% chance of insertion
@@ -108,7 +109,7 @@ def train_model(classifier):
 
             [p, q] = get_probability_distributions(new_msg.id_float, known_messages,
                                                    seen_messages)
-
+            current_entropy = calculate_entropy(seen_messages)
             features.append([new_msg.id_float,
                              find_num_occurrences_in_last_second(len(msgs_parsed) - 1,
                                                                  new_msg.id_float,
@@ -139,7 +140,7 @@ def train_model(classifier):
 
                 [p, q] = get_probability_distributions(new_msg.id_float, known_messages,
                                                        seen_messages)
-
+                current_entropy = calculate_entropy(seen_messages)
                 features.append([new_msg.id_float,
                                  find_num_occurrences_in_last_second(len(msgs_parsed) - 1,
                                                                      new_msg.id_float,
@@ -165,7 +166,7 @@ def train_model(classifier):
 
                 [p, q] = get_probability_distributions(new_msg.id_float, known_messages,
                                                        seen_messages)
-
+                current_entropy = calculate_entropy(seen_messages)
                 features.append([new_msg.id_float,
                                  find_num_occurrences_in_last_second(len(msgs_parsed) - 1,
                                                                      new_msg.id_float,
@@ -224,6 +225,7 @@ def test_model(classifier, print_test):
                                                              can_msgs[i].timestamp, msgs_parsed),
                          calculate_relative_entropy(q, p), current_entropy - previous_entropy, 1])
         labels.append(0)
+        previous_entropy = current_entropy
         msg_types.append('Valid')
         if print_test is True:
             prediction = classifier.prediction_wrapper(msgs_parsed[len(msgs_parsed) - 1],
@@ -251,7 +253,7 @@ def test_model(classifier, print_test):
 
             [p, q] = get_probability_distributions(new_msg.id_float, known_messages,
                                                    seen_messages)
-
+            current_entropy = calculate_entropy(seen_messages)
             features.append([new_msg.id_float,
                              find_num_occurrences_in_last_second(len(msgs_parsed) - 1,
                                                                  new_msg.id_float,
@@ -296,7 +298,7 @@ def test_model(classifier, print_test):
 
                 [p, q] = get_probability_distributions(new_msg.id_float, known_messages,
                                                        seen_messages)
-
+                current_entropy = calculate_entropy(seen_messages)
                 features.append([new_msg.id_float,
                                  find_num_occurrences_in_last_second(len(msgs_parsed) - 1,
                                                                      new_msg.id_float,
@@ -336,7 +338,7 @@ def test_model(classifier, print_test):
 
                 [p, q] = get_probability_distributions(new_msg.id_float, known_messages,
                                                        seen_messages)
-
+                current_entropy = calculate_entropy(seen_messages)
                 features.append([new_msg.id_float,
                                  find_num_occurrences_in_last_second(len(msgs_parsed) - 1,
                                                                      new_msg.id_float,
@@ -436,5 +438,5 @@ def test_model(classifier, print_test):
 
 if __name__ == "__main__":
     msg_classifier = MessageClassifier(os.getcwd() + '/ml_ids_model')
-    # train_model(msg_classifier)
+    train_model(msg_classifier)
     test_model(msg_classifier, False)
