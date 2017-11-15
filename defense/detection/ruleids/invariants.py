@@ -54,13 +54,12 @@ def check_many_id(msg_log):
 
 def frequency_error_invariant(msg_log):
     errorMessage = "None"
-
     while i in range(1, len(msg_log) - 50):
         timestampInterval = abs(msg_log[i].timestamp - msg_log[i + 1].timestamp)
         i = i + 1
-    	if timestampInterval <= 0.0014 / 2
-	    	errorMessage == "time interval less than half"
-	    	break
+        if timestampInterval <= 0.0014 / 2
+	        errorMessage == "time interval less than half"
+	        break
 		
     return errorMessage
 	
