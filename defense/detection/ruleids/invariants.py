@@ -52,6 +52,22 @@ def check_many_id(msg_log):
         x = 0
     return None
 
+def stringfrequencyErrorInvariant():
+    errorMessage = "None"
+    timestampOne = 0
+    timestampTwo = 0
+    from can import Message
+    testOne = Message()
+    from can import Message
+    testTwo = Message()
+    
+    timestampInterval = abs(timestampTwo - timestampOne)
+
+	if timestampInterval <= .0014/2
+	
+		errorMessage == "time interval less than half"
+		
+    return errorMessage
 	
 			
 
