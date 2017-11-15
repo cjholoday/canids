@@ -57,7 +57,8 @@ def frequency_error_invariant(msg_log):
 
     while i in range(1, len(msg_log) - 50):
         timestampInterval = abs(msg_log[i].timestamp - msg_log[i + 1].timestamp)
-    	if timestampInterval <= .0014/2
+        i = i + 1
+    	if timestampInterval <= 0.0014 / 2
 	    	errorMessage == "time interval less than half"
 	    	break
 		
