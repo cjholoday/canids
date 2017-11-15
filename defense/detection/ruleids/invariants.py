@@ -17,7 +17,7 @@ def check_invariants(msg_log):
     """
 
     # A list of all invariant checking functions
-    invariant_checks = [check_nonzero_id,check_many_id]
+    invariant_checks = [check_nonzero_id,check_many_id, frequency_error_invariant]
 
     # Check all invariants
     for invariant_check in invariant_checks:
@@ -52,7 +52,7 @@ def check_many_id(msg_log):
         x = 0
     return None
 
-def stringfrequencyErrorInvariant():
+def frequency_error_invariant():
     errorMessage = "None"
     timestampOne = 0
     timestampTwo = 0
