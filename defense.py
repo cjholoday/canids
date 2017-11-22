@@ -5,6 +5,8 @@ import multiprocessing
 from time import sleep
 from multiprocessing import Process
 
+from defense.detection.mlids.classifier_impl import MessageClassifier
+
 
 import click
 import ruleids
@@ -38,7 +40,8 @@ def main(time, channel, quiet, quiet_ruleids, quiet_ml, quiet_response):
                               args=(payloads, quiet_ruleids, channel,))
 
     # FIXME
-    ml_defense = Process(target=dummy_machine_learning_defense, 
+    ml_ids = MessageClassifier(os.getcwd() + '/ml_ids_model')
+    ml_defense = Process(target=ml_ids.detect_attacks,
                          args=(payloads, quiet_ml, channel))
 
     # FIXME
