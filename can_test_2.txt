@@ -1,0 +1,27 @@
+X 5 can 3
+candump can1
+python3 data/send_from_log.py can1 data/logs/recording1.log
+python3 speedometer.py can1
+python3 attack.py -q -c can0 spoof
+python3 defense/response/response.py can2 10 
+
+X 3 can 3
+python3 speedometer.py can1
+python3 attack.py -q -c can0 spoof
+python3 defense/response/response.py can2 20 
+
+X 3 can 3
+python3 speedometer.py can0
+python3 defense/response/response.py can2 20 
+python3 attack.py -q -c can1 spoof
+
+X 4 vcan 1
+python3 speedometer.py vcan0
+python3 data/send_from_log.py vcan0 data/logs/recording1.log
+candump vcan0
+python3 attack.py -q -c vcan0 spoof
+
+3 vcan 1
+python3 data/send_from_log.py vcan0 data/logs/recording1.log
+python3 defense.py -q -c vcan0
+python3 attack.py -q -c vcan0 spoof

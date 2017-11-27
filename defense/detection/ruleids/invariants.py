@@ -37,7 +37,7 @@ def check_nonzero_id(msg_log):
 
 def check_many_id(msg_log):
     """ Checks that the id isn't the same for x times"""
-
+'''
     # FIXME: This function infinite loops currently. Skip it for now
     return None
 
@@ -51,12 +51,12 @@ def check_many_id(msg_log):
                 return "messages have repeating arbitration id"
         x = 0
     return None
+'''
 
 def frequency_error_invariant(msg_log):
     errorMessage = "None"
-    while i in range(1, len(msg_log) - 50):
+    for i in range(1, len(msg_log) - 50):
         timestampInterval = abs(msg_log[i].timestamp - msg_log[i + 1].timestamp)
-        i = i + 1
         if timestampInterval<=0.0014/2.0:
 	        errorMessage == "time interval less than half"
 	        break

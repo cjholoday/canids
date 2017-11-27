@@ -6,8 +6,8 @@ import click
 
 @click.command()
 @click.option('-s','--script_file', type=str)
-@click.option('-t1', '--time_per_test', type=int, default=5) 
-@click.option('-t2', '--time_betw_cmds', type=int, default=1)
+@click.option('-t1', '--time_per_test', type=int, default=10) 
+@click.option('-t2', '--time_betw_cmds', type=int, default=2)
 @click.option('-t3', '--time_betw_tests', type=int, default=1) 
 @click.option('-d', '--max_devices', type=int, default=1)
 @click.option('-b', '--bitrate', type=str, default='500000') 

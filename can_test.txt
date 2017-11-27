@@ -1,6 +1,15 @@
-2 can 1
-cangen can0
+X 3 can 3
 candump can0
+python3 data/send_from_log.py can1 data/logs/recording1.log
+python3 attack.py -q -c can2 dos
+
+2 vcan 1
+candump vcan0
+python3 data/send_from_log.py vcan0 data/logs/recording1.log
+
+X 1 can 1
+candump can0
+cangen can0
 
 X 2 vcan 1
 candump vcan0
@@ -23,11 +32,6 @@ python3 attack.py -q -c vcan0 dos
 X 2 can 2
 candump can0
 python3 attack.py -q -c can1 fuzz
-
-X 3 can 3
-candump can0
-python3 data/send_from_log.py can1 data/logs/recording1.log
-python3 attack.py -q -c can2 dos
 
 reference:
 
