@@ -7,6 +7,7 @@ from multiprocessing import Process
 
 from defense.detection.mlids.classifier_impl import MessageClassifier
 
+import response
 
 import click
 import ruleids
@@ -39,14 +40,12 @@ def main(time, channel, quiet, quiet_ruleids, quiet_ml, quiet_response):
     ruleids_defense = Process(target=ruleids.detect_attacks, 
                               args=(payloads, quiet_ruleids, channel,))
 
-    # FIXME
     ml_ids = MessageClassifier(os.getcwd() + '/ml_ids_model')
     ml_defense = Process(target=ml_ids.detect_attacks,
                          args=(payloads, quiet_ml, channel))
 
-    # FIXME
-    response_scheme = Process(target=dummy_response_scheme, 
-                              args=(payloads, quiet_response))
+    response_scheme = Process(target=response.response, 
+                              args=(payloads, quiet_response, channel,))
 
     ruleids_defense.start()
     ml_defense.start()

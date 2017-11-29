@@ -21,7 +21,7 @@ class MessageClassifier:
         self.known_messages = self.get_known_messages()
         self.current_entropy = 0
 
-        tf.logging.set_verbosity(tf.logging.INFO)
+        #tf.logging.set_verbosity(tf.logging.INFO)
 
         self.batch_size = 1000
         self.num_steps = 1000
@@ -273,5 +273,6 @@ class MessageClassifier:
                 prediction = self.prediction_wrapper(new_msg, msg_log, seen_messages)
 
                 if prediction is True:
+                    can_msg.defense = 'mlids'
                     detection_q.put(can_msg)
-                    print(new_msg.id + ' at timestamp ' + str(new_msg.timestamp) + ' is MALICIOUS')
+                    #print(new_msg.id + ' at timestamp ' + str(new_msg.timestamp) + ' is MALICIOUS')
